@@ -18,13 +18,9 @@ import { REPO_URL } from "@/lib/site";
 
 export function Nav() {
   const { scrollY } = useScroll();
-  const [hidden, setHidden] = useState(false);
+  // Always pinned; it just gains a frosted background once the page scrolls.
   const [solid, setSolid] = useState(false);
-  useMotionValueEvent(scrollY, "change", (y) => {
-    const prev = scrollY.getPrevious() ?? 0;
-    setHidden(y > prev && y > 400);
-    setSolid(y > 24);
-  });
+  useMotionValueEvent(scrollY, "change", (y) => setSolid(y > 24));
   const links = [
     ["Features", "#features"],
     ["Templates", "#templates"],
@@ -33,11 +29,7 @@ export function Nav() {
     ["For agents", "/agents"],
   ];
   return (
-    <motion.header
-      animate={{ y: hidden ? -90 : 0 }}
-      transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-      className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4"
-    >
+    <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4">
       <nav
         className={cn(
           "flex w-full max-w-6xl items-center justify-between rounded-2xl px-3 py-2 pl-4 transition-[background,box-shadow,backdrop-filter] duration-500",
@@ -60,7 +52,7 @@ export function Nav() {
           </Link>
         </div>
       </nav>
-    </motion.header>
+    </header>
   );
 }
 
