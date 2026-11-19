@@ -39,6 +39,7 @@ import { ColorField, IconButton, NumberField, Row, Section, Segmented, Select, S
 import { cn } from "@/components/ui/cn";
 import { ICONS } from "@/components/slide/icons";
 import { setBackgroundImage } from "./insert";
+import { TextureSwatch } from "./TextureSwatch";
 
 export function Inspector() {
   const selected = useSelectedElements();
@@ -523,9 +524,8 @@ function SlideInspector() {
       <Section title="Texture">
         <div className="grid grid-cols-4 gap-1.5">
           {TEXTURES.map((t) => (
-            <button key={t.id} onClick={() => setSlide((s) => void (s.texture.kind = t.id as TextureKind))} className="flex flex-col items-center gap-1">
-              <TextureSwatch kind={t.id} active={slide.texture.kind === t.id} theme={theme} />
-              <span className={cn("text-[10px]", slide.texture.kind === t.id ? "text-ink" : "text-muted")}>{t.name}</span>
+            <button key={t.id} onClick={() => setSlide((s) => void (s.texture.kind = t.id as TextureKind))} title={t.name}>
+              <TextureSwatch kind={t.id} active={slide.texture.kind === t.id} theme={theme} label={t.name} />
             </button>
           ))}
         </div>
@@ -542,15 +542,6 @@ function SlideInspector() {
 
       <Layers />
     </div>
-  );
-}
-
-function TextureSwatch({ kind, active, theme }: { kind: TextureKind; active: boolean; theme: Theme }) {
-  const css = textureCSS(kind, 0.9, isDark(theme.bg));
-  return (
-    <span className={cn("relative block aspect-square w-full overflow-hidden rounded-lg ring-offset-2 ring-offset-panel", active ? "ring-2 ring-accent" : "ring-1 ring-line")} style={{ background: theme.bg }}>
-      {css && <span className="absolute inset-0" style={{ ...css, backgroundSize: "60px 60px" }} />}
-    </span>
   );
 }
 

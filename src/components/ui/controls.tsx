@@ -20,8 +20,9 @@ export function Section({ title, children, action, defaultOpen = true }: { title
       </div>
       <AnimatePresence initial={false}>
         {open && (
-          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }} className="overflow-hidden">
-            <div className="flex flex-col gap-3 pt-3">{children}</div>
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }} className="-mx-1.5 overflow-hidden">
+            {/* A little inner breathing room so focus rings and selection outlines aren't clipped. */}
+            <div className="flex flex-col gap-3 px-1.5 pt-3 pb-1">{children}</div>
           </motion.div>
         )}
       </AnimatePresence>

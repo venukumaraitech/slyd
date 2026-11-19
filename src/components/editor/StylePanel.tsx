@@ -13,6 +13,7 @@ import { ColorField, Row, Section, Select, Slider } from "@/components/ui/contro
 import { cn } from "@/components/ui/cn";
 import { toast } from "@/components/ui/Toast";
 import { HighlightGlyph } from "./Inspector";
+import { TextureSwatch } from "./TextureSwatch";
 
 /**
  * The whole carousel's look in one place: every control here changes all
@@ -316,27 +317,19 @@ export function StylePanel() {
 
       <Section title="Texture">
         <div className="grid grid-cols-4 gap-1.5">
-          {TEXTURES.map((t) => {
-            const css = textureCSS(t.id, 0.9, isDark(theme.bg));
-            const active = texture.kind === t.id;
-            return (
-              <button
-                key={t.id}
-                onClick={() =>
-                  mutate((d) => {
-                    for (const s of d.slides) s.texture = { kind: t.id, opacity: s.texture.kind === "none" ? 0.5 : s.texture.opacity };
-                  })
-                }
-                className="flex flex-col items-center gap-1"
-              >
-                <span className={cn("relative block aspect-square w-full overflow-hidden rounded-lg ring-offset-2 ring-offset-panel", active ? "ring-2 ring-accent" : "ring-1 ring-line")} style={{ background: theme.bg }}>
-                  {css && <span className="absolute inset-0" style={{ ...css, backgroundSize: "60px 60px" }} />}
-                  {active && <Check size={12} className="absolute right-1 bottom-1" style={{ color: theme.accent }} />}
-                </span>
-                <span className={cn("text-[10px]", active ? "text-ink" : "text-muted")}>{t.name}</span>
-              </button>
-            );
-          })}
+          {TEXTURES.map((t) => (
+            <button
+              key={t.id}
+              title={t.name}
+              onClick={() =>
+                mutate((d) => {
+                  for (const s of d.slides) s.texture = { kind: t.id, opacity: s.texture.kind === "none" ? 0.5 : s.texture.opacity };
+                })
+              }
+            >
+              <TextureSwatch kind={t.id} active={texture.kind === t.id} theme={theme} label={t.name} />
+            </button>
+          ))}
         </div>
         {texture.kind !== "none" && (
           <Row label="Strength">
