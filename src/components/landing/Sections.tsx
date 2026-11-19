@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ArrowRight, Check, GraduationCap, Megaphone, Palette, Plus, Rocket, Sparkles, X } from "lucide-react";
+import { ArrowRight, Bookmark, Check, GraduationCap, Heart, Megaphone, MessageCircle, Palette, Plus, Rocket, Send, Sparkles, X } from "lucide-react";
 import { ScaledSlide } from "@/components/slide/SlideRenderer";
 import { Github } from "@/components/ui/BrandIcons";
 import { MagneticLink } from "@/components/ui/Button";
@@ -60,6 +60,10 @@ const STEPS = [
   { n: "04", t: "Export and post", d: "One click for PNGs, a PDF for LinkedIn, or a ZIP of everything.", tpl: "photo" },
 ];
 
+/** Phone screen in the "How it works" demo: the editor preview's 360×760 screen, scaled to 300 wide. */
+const PHONE_W = 300;
+const PHONE_H = Math.round((PHONE_W * 760) / 360);
+
 export function HowItWorks() {
   const root = useRef<HTMLElement>(null);
   const [active, setActive] = useState(0);
@@ -88,28 +92,58 @@ export function HowItWorks() {
           ))}
         </div>
         <div className="relative hidden lg:block">
-          <div className="sticky top-[18vh]">
-            <div className="relative mx-auto w-85 rounded-[48px] bg-ink p-3 shadow-lg">
-              <div className="overflow-hidden rounded-[38px] bg-black">
-                <div className="flex items-center gap-2 px-4 py-3 text-white">
+          {/* Same phone as the editor's preview (360×760 screen, scaled), so its size never changes between steps. */}
+          <div className="sticky top-[max(5.5rem,calc(50vh-330px))]">
+            <div className="relative mx-auto w-fit rounded-[46px] bg-ink p-3 shadow-[0_0_0_1px_rgb(0_0_0/.2),0_50px_100px_-30px_rgb(0_0_0/.45)]">
+              <div className="flex flex-col overflow-hidden rounded-[36px] bg-black text-white" style={{ width: PHONE_W, height: PHONE_H }}>
+                <div className="flex h-8 shrink-0 items-center justify-between px-6 pt-1 text-[11px] font-semibold">
+                  <span>9:41</span>
+                  <span className="h-[19px] w-[76px] rounded-full bg-[#111]" />
+                  <span className="tracking-tighter">●●●</span>
+                </div>
+                <div className="flex h-[46px] shrink-0 items-center gap-2 px-3.5">
                   <div className="h-7 w-7 rounded-full bg-accent" />
-                  <span className="text-[12px] font-semibold">avamakes</span>
+                  <div className="leading-tight">
+                    <div className="text-[12px] font-semibold">avamakes</div>
+                    <div className="text-[10px] opacity-55">Original audio</div>
+                  </div>
                   <span className="ml-auto text-[16px] leading-none opacity-70">···</span>
                 </div>
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={active}
-                    initial={{ opacity: 0, x: 40, filter: "blur(6px)" }}
-                    animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-                    exit={{ opacity: 0, x: -40, filter: "blur(6px)" }}
-                    transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-                  >
-                    <ScaledSlide width={316} slide={p.slides[Math.min(active, p.slides.length - 1)]} doc={p} index={active} total={p.slides.length} />
-                  </motion.div>
-                </AnimatePresence>
-                <div className="flex items-center justify-center gap-1 py-3">
-                  {[0, 1, 2, 3, 4].map((d) => (
-                    <span key={d} className={cn("h-1.5 w-1.5 rounded-full transition-colors", d === active ? "bg-sky-400" : "bg-white/30")} />
+                <div className="relative shrink-0 overflow-hidden" style={{ width: PHONE_W, height: Math.round(PHONE_W * 1.25) }}>
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.div
+                      key={active}
+                      initial={{ opacity: 0, x: 40, filter: "blur(6px)" }}
+                      animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                      exit={{ opacity: 0, x: -40, filter: "blur(6px)" }}
+                      transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                      className="absolute inset-0"
+                    >
+                      <ScaledSlide width={PHONE_W} slide={p.slides[Math.min(active, p.slides.length - 1)]} doc={p} index={active} total={p.slides.length} />
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+                <div className="shrink-0 px-3.5 pt-2.5">
+                  <div className="flex items-center gap-3.5">
+                    <Heart size={19} />
+                    <MessageCircle size={19} />
+                    <Send size={18} />
+                    <div className="flex flex-1 justify-center gap-1">
+                      {[0, 1, 2, 3, 4].map((d) => (
+                        <span key={d} className={cn("h-1.5 w-1.5 rounded-full transition-colors", d === active ? "bg-sky-400" : "bg-white/30")} />
+                      ))}
+                    </div>
+                    <div className="w-[50px]" />
+                    <Bookmark size={18} />
+                  </div>
+                  <div className="mt-2 text-[11.5px]">
+                    <b>avamakes</b> <span className="opacity-75">{STEPS[active].t}</span>
+                  </div>
+                </div>
+                <div className="min-h-0 flex-1" />
+                <div className="flex h-[42px] shrink-0 items-center justify-around border-t border-white/10 px-5 text-white/80">
+                  {[0, 1, 2, 3, 4].map((k) => (
+                    <span key={k} className={cn("h-[17px] w-[17px] rounded-[5px] border-2 border-current", k === 0 && "bg-current")} />
                   ))}
                 </div>
               </div>
