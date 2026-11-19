@@ -212,14 +212,28 @@ function ExportModal({ onClose }: { onClose: () => void }) {
 
 /* ================================================================ preview */
 
+/** Fixed phone screen (px) and the height of each piece of app chrome around the post. */
+const PHONE = { w: 360, h: 760, status: 36, header: 52, tabs: 48, igActions: 92, liCaption: 34, liActions: 44 };
+
 function PreviewModal({ onClose }: { onClose: () => void }) {
   const project = useEditor((s) => s.project)!;
   const activeId = useEditor((s) => s.activeSlideId);
   const [i, setI] = useState(Math.max(0, project.slides.findIndex((s) => s.id === activeId)));
   const [platform, setPlatform] = useState<"instagram" | "linkedin">("instagram");
   const n = project.slides.length;
-  const W = 360;
-  const H = slideHeight(project.aspect) * (W / SLIDE_W);
+  // The phone is always the same size: the slide fits inside the screen instead of stretching the phone.
+  const ratio = slideHeight(project.aspect) / SLIDE_W;
+  const chrome = PHONE.status + PHONE.header + PHONE.tabs + (platform === "instagram" ? PHONE.igActions : PHONE.liCaption + PHONE.liActions);
+  const W = Math.min(PHONE.w, Math.floor((PHONE.h - chrome) / ratio));
+  const H = Math.round(W * ratio);
+  // Shrink the whole phone (never grow it) on short windows.
+  const [fit, setFit] = useState(1);
+  useEffect(() => {
+    const r = () => setFit(Math.min(1, (window.innerHeight - 150) / (PHONE.h + 32)));
+    r();
+    window.addEventListener("resize", r);
+    return () => window.removeEventListener("resize", r);
+  }, []);
   const go = (d: number) => setI((x) => Math.min(n - 1, Math.max(0, x + d)));
   useEffect(() => {
     const k = (e: KeyboardEvent) => {
@@ -239,16 +253,17 @@ function PreviewModal({ onClose }: { onClose: () => void }) {
   return (
     <Shell onClose={onClose} dark className="flex flex-col items-center gap-5">
       <div className="flex items-center gap-3">
-        <div className="w-56 rounded-xl bg-white/10 p-0.5 [&_*]:!text-white">
-          <Segmented
-            layoutId="pv-plat"
-            value={platform}
-            onChange={setPlatform}
-            options={[
-              { value: "instagram", label: "Instagram" },
-              { value: "linkedin", label: "LinkedIn" },
-            ]}
-          />
+        <div className="flex rounded-xl bg-white/10 p-1">
+          {(["instagram", "linkedin"] as const).map((pl) => (
+            <button
+              key={pl}
+              onClick={() => setPlatform(pl)}
+              className={cn("relative h-8 w-28 rounded-lg text-[13px] font-medium transition-colors", platform === pl ? "text-black" : "text-white/70 hover:text-white")}
+            >
+              {platform === pl && <motion.span layoutId="pv-plat" className="absolute inset-0 rounded-lg bg-white" transition={{ type: "spring", stiffness: 500, damping: 38 }} />}
+              <span className="relative">{pl === "instagram" ? "Instagram" : "LinkedIn"}</span>
+            </button>
+          ))}
         </div>
         <CloseBtn onClose={onClose} light />
       </div>
@@ -256,14 +271,14 @@ function PreviewModal({ onClose }: { onClose: () => void }) {
         <button onClick={() => go(-1)} disabled={i === 0} className="grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20 disabled:opacity-20">
           <ChevronLeft size={20} />
         </button>
-        <div className="w-[392px] rounded-[52px] bg-[#0b0b0b] p-4 shadow-[0_0_0_2px_#2a2a2a,0_60px_120px_-30px_rgb(0_0_0/.8)]">
-          <div className={cn("overflow-hidden rounded-[38px]", platform === "instagram" ? "bg-black text-white" : "bg-[#f4f2ee] text-black")}>
-            <div className="flex h-9 items-center justify-between px-7 pt-2 text-[12px] font-semibold">
+        <div data-phone className="shrink-0 rounded-[52px] bg-[#0b0b0b] p-4 shadow-[0_0_0_2px_#2a2a2a,0_60px_120px_-30px_rgb(0_0_0/.8)]" style={{ zoom: fit }}>
+          <div className={cn("flex flex-col overflow-hidden rounded-[38px]", platform === "instagram" ? "bg-black text-white" : "bg-[#f4f2ee] text-black")} style={{ width: PHONE.w, height: PHONE.h }}>
+            <div className="flex h-9 shrink-0 items-center justify-between px-7 pt-2 text-[12px] font-semibold">
               <span>9:41</span>
               <span className="h-[22px] w-[90px] rounded-full bg-black" />
               <span>●●●</span>
             </div>
-            <div className={cn("flex items-center gap-2.5 px-4 py-2.5", platform === "linkedin" && "bg-white")}>
+            <div className={cn("flex h-[52px] shrink-0 items-center gap-2.5 px-4", platform === "linkedin" && "bg-white")}>
               {brand.avatar ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={brand.avatar} alt="" className="h-8 w-8 rounded-full object-cover" />
@@ -278,8 +293,8 @@ function PreviewModal({ onClose }: { onClose: () => void }) {
               </div>
               <span className="opacity-70">···</span>
             </div>
-            {platform === "linkedin" && <div className="bg-white px-4 pb-2.5 text-[12.5px] leading-snug">{project.name}. Swipe through 👉</div>}
-            <div className="relative overflow-hidden bg-black" style={{ width: W, height: H }}>
+            {platform === "linkedin" && <div className="flex h-[34px] shrink-0 items-start truncate bg-white px-4 text-[12.5px] leading-snug">{project.name}. Swipe through 👉</div>}
+            <div className={cn("relative mx-auto shrink-0 overflow-hidden", platform === "instagram" ? "bg-black" : "bg-[#f4f2ee]")} style={{ width: W, height: H }}>
               <motion.div className="flex cursor-grab active:cursor-grabbing" drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0.2} onDragEnd={onDragEnd} animate={{ x: -i * W }} transition={{ type: "spring", stiffness: 300, damping: 34 }}>
                 {project.slides.map((s, k) => (
                   <div key={s.id} className="shrink-0" style={{ width: W }}>
@@ -292,7 +307,7 @@ function PreviewModal({ onClose }: { onClose: () => void }) {
               </span>
             </div>
             {platform === "instagram" ? (
-              <div className="px-4 pt-3 pb-6">
+              <div className="h-[92px] shrink-0 px-4 pt-3">
                 <div className="flex items-center gap-4">
                   <Heart size={22} />
                   <MessageCircle size={22} />
@@ -310,7 +325,7 @@ function PreviewModal({ onClose }: { onClose: () => void }) {
                 </div>
               </div>
             ) : (
-              <div className="flex justify-around bg-white px-4 py-3 text-[12px] font-medium text-black/60">
+              <div className="flex h-[44px] shrink-0 items-center justify-around bg-white px-4 text-[12px] font-medium text-black/60">
                 <span className="flex items-center gap-1.5">
                   <ThumbsUp size={16} /> Like
                 </span>
@@ -325,6 +340,13 @@ function PreviewModal({ onClose }: { onClose: () => void }) {
                 </span>
               </div>
             )}
+            {/* The rest of the feed, then the app's tab bar, so the screen is always full. */}
+            <div className={cn("min-h-0 flex-1", platform === "instagram" ? "bg-black" : "bg-[#f4f2ee]")} />
+            <div className={cn("flex h-[48px] shrink-0 items-center justify-around border-t px-6", platform === "instagram" ? "border-white/10 bg-black text-white/80" : "border-black/10 bg-white text-black/55")}>
+              {[0, 1, 2, 3, 4].map((k) => (
+                <span key={k} className={cn("h-5 w-5 rounded-md border-2 border-current", k === 0 && "bg-current")} />
+              ))}
+            </div>
           </div>
         </div>
         <button onClick={() => go(1)} disabled={i === n - 1} className="grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20 disabled:opacity-20">

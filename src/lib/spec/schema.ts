@@ -192,6 +192,13 @@ export const BrandSpec = z
     counter: z.boolean().optional().describe("Show the '03 / 07' page counter. Default true."),
     arrow: z.boolean().optional().describe("Show the swipe arrow. Default true."),
     color: ColorSpec.optional().describe("Footer text colour."),
+    verified: z.boolean().optional().describe("Show a verified badge next to the name."),
+    badge: z.enum(["blue", "gold", "grey", "accent"]).optional().describe("Verified badge colour. Default blue; accent uses the theme accent."),
+    avatarShape: z.enum(["circle", "rounded", "square"]).optional(),
+    size: z.enum(["s", "m", "l"]).optional().describe("Footer size. Default m."),
+    showHandle: z.boolean().optional().describe("Show the @handle under the name. Default true."),
+    counterStyle: z.enum(["numbers", "fraction", "dots", "bar"]).optional().describe("Page counter look: '03 / 07', '3/7', dots or a progress bar."),
+    arrowStyle: z.enum(["circle", "plain", "swipe"]).optional().describe("Swipe hint: arrow in a circle, plain arrow, or 'Swipe →' text."),
   })
   .describe("Optional. Anything omitted falls back to the user's saved brand kit in Slyd.");
 

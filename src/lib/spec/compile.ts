@@ -173,6 +173,13 @@ export function compileSpec(spec: CarouselSpec, brandFallback?: BrandKit, savedT
       showCounter: b?.counter,
       showArrow: b?.arrow,
       color: col(b?.color),
+      verified: b?.verified,
+      verifiedColor: b?.badge,
+      avatarShape: b?.avatarShape,
+      size: b?.size,
+      showHandle: b?.showHandle,
+      counterStyle: b?.counterStyle,
+      arrowStyle: b?.arrowStyle,
     }),
   };
 

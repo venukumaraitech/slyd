@@ -181,11 +181,40 @@ function ShapeContent({ el, theme }: { el: Extract<SlideElement, { type: "shape"
   );
 }
 
+export const VERIFIED_COLORS = { blue: "#1D9BF0", gold: "#E8B323", grey: "#8B98A5" } as const;
+
+/** Scalloped verified badge with a check, drawn as one SVG so it exports crisply. */
+export function VerifiedBadge({ size, color, check = "#fff" }: { size: number; color: string; check?: string }) {
+  const bumps = 8;
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-label="Verified" style={{ flexShrink: 0, display: "block" }}>
+      <g fill={color}>
+        <circle cx="12" cy="12" r="8.6" />
+        {Array.from({ length: bumps }, (_, k) => {
+          const a = (k / bumps) * Math.PI * 2;
+          return <circle key={k} cx={12 + Math.cos(a) * 6.9} cy={12 + Math.sin(a) * 6.9} r="3.9" />;
+        })}
+      </g>
+      <path d="M7.6 12.3l2.9 2.9 5.9-6.1" fill="none" stroke={check} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+const BRAND_SCALE = { s: 0.82, m: 1, l: 1.22 } as const;
+
 function BrandChrome({ doc, index, total, H }: { doc: Doc; index: number; total: number; H: number }) {
+  void H;
   const { brand, theme } = doc;
   const color = resolveColor(brand.color, theme);
+  const accent = resolveColor("$accent", theme);
   const top = brand.position === "top";
   const isLast = index === total - 1;
+  const k = BRAND_SCALE[brand.size ?? "m"];
+  const av = Math.round(72 * k);
+  const radius = brand.avatarShape === "square" ? Math.round(8 * k) : brand.avatarShape === "rounded" ? Math.round(20 * k) : 999;
+  const badge = brand.verifiedColor === "accent" ? accent : VERIFIED_COLORS[(brand.verifiedColor ?? "blue") as keyof typeof VERIFIED_COLORS];
+  const counter = brand.counterStyle ?? "numbers";
+  const arrow = brand.arrowStyle ?? "circle";
   return (
     <div
       style={{
@@ -193,10 +222,10 @@ function BrandChrome({ doc, index, total, H }: { doc: Doc; index: number; total:
         left: 72,
         right: 72,
         [top ? "top" : "bottom"]: 64,
-        height: 72,
+        height: Math.max(av, 56),
         display: "flex",
         alignItems: "center",
-        gap: 20,
+        gap: Math.round(20 * k),
         color,
         fontFamily: resolveFont("$body", theme),
         pointerEvents: "none",
@@ -205,49 +234,69 @@ function BrandChrome({ doc, index, total, H }: { doc: Doc; index: number; total:
     >
       {brand.avatar ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={brand.avatar} alt="" style={{ width: 72, height: 72, borderRadius: 999, objectFit: "cover", border: `2px solid ${color}22` }} />
+        <img src={brand.avatar} alt="" style={{ width: av, height: av, borderRadius: radius, objectFit: "cover", boxShadow: `0 0 0 2px color-mix(in srgb, ${color} 14%, transparent)` }} />
       ) : (
         <div
           style={{
-            width: 72,
-            height: 72,
-            borderRadius: 999,
-            background: resolveColor("$accent", theme),
-            color: isDark(resolveColor("$accent", theme)) ? "#fff" : "#111",
+            width: av,
+            height: av,
+            borderRadius: radius,
+            background: accent,
+            color: isDark(accent) ? "#fff" : "#111",
             display: "grid",
             placeItems: "center",
             fontWeight: 700,
-            fontSize: 30,
+            fontSize: Math.round(30 * k),
           }}
         >
           {(brand.name || "?").trim().charAt(0).toUpperCase()}
         </div>
       )}
-      <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.15 }}>
-        <span style={{ fontSize: 28, fontWeight: 650 }}>{brand.name}</span>
-        <span style={{ fontSize: 24, opacity: 0.6 }}>{brand.handle}</span>
+      <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.15, minWidth: 0 }}>
+        <span style={{ display: "flex", alignItems: "center", gap: Math.round(8 * k), fontSize: Math.round(28 * k), fontWeight: 650, whiteSpace: "nowrap" }}>
+          {brand.name}
+          {brand.verified && <VerifiedBadge size={Math.round(30 * k)} color={badge} check={brand.verifiedColor === "accent" && !isDark(accent) ? "#111" : "#fff"} />}
+        </span>
+        {brand.showHandle !== false && brand.handle && <span style={{ fontSize: Math.round(24 * k), opacity: 0.6, whiteSpace: "nowrap" }}>{brand.handle}</span>}
       </div>
       <div style={{ flex: 1 }} />
-      {brand.showCounter && (
-        <span style={{ fontSize: 24, fontWeight: 500, opacity: 0.6, fontVariantNumeric: "tabular-nums", letterSpacing: ".04em" }}>
-          {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
-        </span>
-      )}
-      {brand.showArrow && !isLast && (
-        <div
-          style={{
-            width: 72,
-            height: 72,
-            borderRadius: 999,
-            border: `2px solid ${color}`,
-            display: "grid",
-            placeItems: "center",
-            opacity: 0.9,
-          }}
-        >
-          <ArrowRight width={34} height={34} strokeWidth={2} />
-        </div>
-      )}
+      {brand.showCounter &&
+        (counter === "dots" ? (
+          <span style={{ display: "flex", gap: Math.round(9 * k), alignItems: "center" }}>
+            {Array.from({ length: Math.min(total, 12) }, (_, d) => (
+              <span key={d} style={{ width: Math.round(11 * k), height: Math.round(11 * k), borderRadius: 99, background: color, opacity: d === index ? 0.95 : 0.25 }} />
+            ))}
+          </span>
+        ) : counter === "bar" ? (
+          <span style={{ position: "relative", width: Math.round(160 * k), height: Math.round(7 * k), borderRadius: 99, background: `color-mix(in srgb, ${color} 18%, transparent)`, overflow: "hidden" }}>
+            <span style={{ position: "absolute", inset: 0, width: `${((index + 1) / total) * 100}%`, borderRadius: 99, background: color, opacity: 0.85 }} />
+          </span>
+        ) : (
+          <span style={{ fontSize: Math.round(24 * k), fontWeight: 500, opacity: 0.6, fontVariantNumeric: "tabular-nums", letterSpacing: ".04em" }}>
+            {counter === "fraction" ? `${index + 1}/${total}` : `${String(index + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}`}
+          </span>
+        ))}
+      {brand.showArrow &&
+        !isLast &&
+        (arrow === "swipe" ? (
+          <span style={{ display: "flex", alignItems: "center", gap: Math.round(8 * k), fontSize: Math.round(24 * k), fontWeight: 600, opacity: 0.9 }}>
+            Swipe <ArrowRight width={Math.round(28 * k)} height={Math.round(28 * k)} strokeWidth={2.2} />
+          </span>
+        ) : (
+          <div
+            style={{
+              width: av,
+              height: av,
+              borderRadius: 999,
+              border: arrow === "circle" ? `2px solid ${color}` : "none",
+              display: "grid",
+              placeItems: "center",
+              opacity: 0.9,
+            }}
+          >
+            <ArrowRight width={Math.round(34 * k * (arrow === "plain" ? 1.2 : 1))} height={Math.round(34 * k * (arrow === "plain" ? 1.2 : 1))} strokeWidth={2} />
+          </div>
+        ))}
     </div>
   );
 }

@@ -35,7 +35,17 @@ export interface BrandKit {
   showCounter: boolean;
   showArrow: boolean;
   color: ColorRef;
+  /** Verified badge next to the name. */
+  verified?: boolean;
+  verifiedColor?: VerifiedColor;
+  avatarShape?: "circle" | "rounded" | "square";
+  size?: "s" | "m" | "l";
+  showHandle?: boolean;
+  counterStyle?: "numbers" | "fraction" | "dots" | "bar";
+  arrowStyle?: "circle" | "plain" | "swipe";
 }
+
+export type VerifiedColor = "blue" | "gold" | "grey" | "accent";
 
 export type HighlightStyle = "color" | "marker" | "underline" | "pill" | "italic";
 

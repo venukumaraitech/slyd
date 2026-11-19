@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowRight, KeyRound, Loader2, Search, Wallpaper, X } from "lucide-react";
 import { PROVIDERS, defaultProvider, getKeys, getProvider, setKey, type ProviderId, type StockPhoto } from "@/lib/stock";
@@ -122,26 +121,37 @@ export function PhotosPanel() {
             </button>
           )}
         </form>
-        <div className="grid grid-cols-5 gap-0.5 rounded-xl bg-panel-2 p-1">
-          {PROVIDERS.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => setProvider(p.id)}
-              title={p.needsKey && !keys[p.id] ? `${p.name} needs a free API key` : p.name}
-              className={cn("relative rounded-lg py-1.5 text-[10.5px] font-medium transition-colors", provider === p.id ? "text-ink" : "text-muted hover:text-ink-2")}
-            >
-              {provider === p.id && <motion.span layoutId="prov" className="absolute inset-0 rounded-lg bg-panel shadow-sm" transition={{ type: "spring", stiffness: 500, damping: 35 }} />}
-              <span className="relative flex items-center justify-center gap-1">
+        {/* Sources as roomy pills that wrap, so every one is easy to hit. */}
+        <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="Photo source">
+          {PROVIDERS.map((p) => {
+            const on = provider === p.id;
+            const locked = p.needsKey && !keys[p.id];
+            return (
+              <button
+                key={p.id}
+                role="tab"
+                aria-selected={on}
+                onClick={() => setProvider(p.id)}
+                title={locked ? `${p.name} needs a free API key` : p.name}
+                className={cn(
+                  "flex h-8 items-center gap-1.5 rounded-full px-3 text-[12px] font-medium transition-colors",
+                  on ? "bg-ink text-bg" : "bg-panel-2 text-ink-2 hover:bg-line hover:text-ink",
+                )}
+              >
                 {p.name}
-                {p.needsKey && !keys[p.id] && <KeyRound size={10} className="opacity-60" />}
-              </span>
-            </button>
-          ))}
+                {locked && <KeyRound size={11} className="opacity-60" />}
+              </button>
+            );
+          })}
         </div>
         {meta.searchable && (
           <div className="flex items-center gap-1">
             {([undefined, "portrait", "landscape", "squarish"] as const).map((o) => (
-              <button key={o ?? "any"} onClick={() => setOrientation(o)} className={cn("rounded-md px-2 py-0.5 text-[11px] capitalize", orientation === o ? "bg-accent-soft text-accent" : "text-muted hover:text-ink")}>
+              <button
+                key={o ?? "any"}
+                onClick={() => setOrientation(o)}
+                className={cn("h-7 rounded-lg px-2.5 text-[12px] capitalize transition-colors", orientation === o ? "bg-accent-soft font-medium text-accent" : "text-muted hover:bg-line hover:text-ink")}
+              >
                 {o === "squarish" ? "Square" : o ?? "Any"}
               </button>
             ))}

@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { BadgeCheck, Image as ImageIcon, LayoutTemplate, Palette, PanelsTopLeft, PenLine, Shapes, Type, Upload, Trash2, UserRound, Check } from "lucide-react";
-import { ScaledSlide } from "@/components/slide/SlideRenderer";
+import { ScaledSlide, VERIFIED_COLORS, VerifiedBadge } from "@/components/slide/SlideRenderer";
 import { ICONS } from "@/components/slide/icons";
 import { ColorField, Row, Segmented, Toggle } from "@/components/ui/controls";
 import { cn } from "@/components/ui/cn";
@@ -12,6 +12,7 @@ import { SLIDE_W, slideHeight } from "@/lib/model/constants";
 import { heading, icon, kicker, shape, text, uid } from "@/lib/model/factory";
 import { LAYOUTS, TEMPLATES, buildLayout, buildTemplateSlides, styleFromTemplateId } from "@/lib/model/templates";
 import { defaultTheme } from "@/lib/model/factory";
+import { isDark } from "@/lib/model/resolve";
 import { fileToDataUrl } from "@/lib/image";
 import { getPref, setPref } from "@/lib/storage";
 import type { ShapeKind, Slide, SlideElement } from "@/lib/model/types";
@@ -406,6 +407,15 @@ function UploadsPanel() {
 
 /* ------------------------------------------------------------------ brand */
 
+function BrandGroup({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-2.5 border-t border-line pt-4">
+      <div className="text-[11px] font-semibold tracking-[.08em] text-muted uppercase">{title}</div>
+      {children}
+    </div>
+  );
+}
+
 function BrandPanel() {
   const brand = useEditor((s) => s.project!.brand);
   const theme = useEditor((s) => s.project!.theme);
@@ -461,20 +471,86 @@ function BrandPanel() {
               Remove avatar
             </button>
           )}
-          <Segmented
-            layoutId="brand-pos"
-            value={brand.position}
-            onChange={(v) => set({ position: v })}
-            options={[
-              { value: "top", label: "Top" },
-              { value: "bottom", label: "Bottom" },
-            ]}
-          />
-          <Toggle label="Page counter (03 / 07)" checked={brand.showCounter} onChange={(v) => set({ showCounter: v })} />
-          <Toggle label="Swipe arrow" checked={brand.showArrow} onChange={(v) => set({ showArrow: v })} />
-          <Row label="Colour">
-            <ColorField value={brand.color} theme={theme} onChange={(v) => set({ color: v })} />
-          </Row>
+          <Toggle label="Show @handle" checked={brand.showHandle !== false} onChange={(v) => set({ showHandle: v })} />
+
+          <BrandGroup title="Verified badge">
+            <Toggle label="Show a verified badge" checked={!!brand.verified} onChange={(v) => set({ verified: v })} />
+            {brand.verified && (
+              <div className="grid grid-cols-4 gap-1.5">
+                {(["blue", "gold", "grey", "accent"] as const).map((c) => {
+                  const col = c === "accent" ? theme.accent : VERIFIED_COLORS[c];
+                  const on = (brand.verifiedColor ?? "blue") === c;
+                  return (
+                    <button
+                      key={c}
+                      onClick={() => set({ verifiedColor: c })}
+                      className={cn("flex flex-col items-center gap-1 rounded-xl py-2 transition", on ? "bg-accent-soft ring-1 ring-accent/50" : "bg-panel-2 hover:bg-line")}
+                    >
+                      <VerifiedBadge size={22} color={col} check={c === "accent" && !isDark(col) ? "#111" : "#fff"} />
+                      <span className={cn("text-[10.5px] capitalize", on ? "text-ink" : "text-muted")}>{c === "accent" ? "Theme" : c}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </BrandGroup>
+
+          <BrandGroup title="Look">
+            <Row label="Position">
+              <Segmented layoutId="brand-pos" value={brand.position} onChange={(v) => set({ position: v })} options={[{ value: "top", label: "Top" }, { value: "bottom", label: "Bottom" }]} />
+            </Row>
+            <Row label="Size">
+              <Segmented layoutId="brand-size" value={brand.size ?? "m"} onChange={(v) => set({ size: v })} options={[{ value: "s", label: "Small" }, { value: "m", label: "Medium" }, { value: "l", label: "Large" }]} />
+            </Row>
+            <Row label="Avatar">
+              <Segmented
+                layoutId="brand-shape"
+                value={brand.avatarShape ?? "circle"}
+                onChange={(v) => set({ avatarShape: v })}
+                options={[
+                  { value: "circle", label: <span className="block h-3.5 w-3.5 rounded-full bg-current" />, title: "Circle" },
+                  { value: "rounded", label: <span className="block h-3.5 w-3.5 rounded-[4px] bg-current" />, title: "Rounded" },
+                  { value: "square", label: <span className="block h-3.5 w-3.5 rounded-[1px] bg-current" />, title: "Square" },
+                ]}
+              />
+            </Row>
+            <Row label="Colour">
+              <ColorField value={brand.color} theme={theme} onChange={(v) => set({ color: v })} />
+            </Row>
+          </BrandGroup>
+
+          <BrandGroup title="Page counter">
+            <Toggle label="Show the counter" checked={brand.showCounter} onChange={(v) => set({ showCounter: v })} />
+            {brand.showCounter && (
+              <Segmented
+                layoutId="brand-counter"
+                value={brand.counterStyle ?? "numbers"}
+                onChange={(v) => set({ counterStyle: v })}
+                options={[
+                  { value: "numbers", label: "03 / 07" },
+                  { value: "fraction", label: "3/7" },
+                  { value: "dots", label: "•••" },
+                  { value: "bar", label: "Bar" },
+                ]}
+              />
+            )}
+          </BrandGroup>
+
+          <BrandGroup title="Swipe hint">
+            <Toggle label="Show on every slide but the last" checked={brand.showArrow} onChange={(v) => set({ showArrow: v })} />
+            {brand.showArrow && (
+              <Segmented
+                layoutId="brand-arrow"
+                value={brand.arrowStyle ?? "circle"}
+                onChange={(v) => set({ arrowStyle: v })}
+                options={[
+                  { value: "circle", label: "◯ →", title: "Arrow in a circle" },
+                  { value: "plain", label: "→", title: "Arrow" },
+                  { value: "swipe", label: "Swipe →", title: "Swipe text" },
+                ]}
+              />
+            )}
+          </BrandGroup>
         </div>
         <button
           onClick={async () => {

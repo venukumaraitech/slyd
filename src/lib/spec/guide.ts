@@ -63,7 +63,7 @@ Any \`photo\` field takes an https URL **or 2–5 search words** ("rainy city st
 - **highlight** (how *words* look): \`color\`, \`italic\`, \`marker\`, \`underline\`, \`pill\`.
 - **texture**: ${TEXTURES.map((t) => `\`${t.id}\``).join(", ")}; \`textureIntensity\` 0–1.
 - **mesh** backgrounds: ${Object.keys(MESHES).map((m) => `\`${m}\``).join(", ")}.
-- **brand**: {name, handle, avatar (https URL), show, position top|bottom, counter, arrow, color}. If omitted, the user's saved Slyd brand kit is used.
+- **brand**: {name, handle, avatar (https URL), show, position top|bottom, counter, arrow, color, verified (badge), badge blue|gold|grey|accent, avatarShape circle|rounded|square, size s|m|l, showHandle, counterStyle numbers|fraction|dots|bar, arrowStyle circle|plain|swipe}. If omitted, the user's saved Slyd brand kit is used.
 - **open**: \`editor\` (default), \`preview\` (phone mockup), or \`export\` (download dialog).
 
 ## Colours
