@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { useState, type ReactNode } from "react";
-import { ArrowRight, Bot, Check, Copy, ExternalLink, Link2, Lock, MessageSquareText, Sparkles, Zap } from "lucide-react";
+import { ArrowRight, Bot, Download, Check, Copy, ExternalLink, Link2, Lock, MessageSquareText, Sparkles, Zap } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { buttonClass } from "@/components/ui/Button";
 import { cn } from "@/components/ui/cn";
-import { DesktopDownload } from "@/components/ui/DesktopDownload";
+import { DesktopDownload, TrackDownload, useDownloadCTA, useIsDesktopApp } from "@/components/ui/DesktopDownload";
 import { DESKTOP_MCP_URL, SITE_URL } from "@/lib/site";
 
 const MCP_URL = `${SITE_URL}/mcp`;
@@ -67,6 +67,25 @@ const Steps = ({ items }: { items: ReactNode[] }) => (
 
 const DOCKER_RUN = "docker run -d -p 3000:3000 --name slyd --restart unless-stopped ghcr.io/venukumaraitech/slyd:latest";
 const LOCAL_MCP = DESKTOP_MCP_URL;
+
+/** In the app: back to your carousels. On the website: download the app. */
+function HeaderAction() {
+  const inApp = useIsDesktopApp();
+  const cta = useDownloadCTA();
+  if (inApp)
+    return (
+      <Link href="/app" className={buttonClass("ink", "sm")}>
+        Your carousels <ArrowRight size={14} />
+      </Link>
+    );
+  return (
+    <TrackDownload>
+      <a href={cta.href} className={buttonClass("ink", "sm")}>
+        <Download size={14} /> {cta.short}
+      </a>
+    </TrackDownload>
+  );
+}
 
 const CLIENTS: Client[] = [
   {
@@ -210,9 +229,7 @@ export function AgentsPage() {
         <Logo />
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <Link href="/app" className={buttonClass("ink", "sm")}>
-            Open editor <ArrowRight size={14} />
-          </Link>
+          <HeaderAction />
         </div>
       </header>
 

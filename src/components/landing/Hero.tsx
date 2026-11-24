@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll, useSpring, useTransform } from "motion/react";
 import { useEffect, useState } from "react";
-import { ArrowRight, Star } from "lucide-react";
+import { ArrowRight, Download, Star } from "lucide-react";
 import { StarButton } from "@/components/ui/StarButton";
+import { DownloadButton, TrackDownload, useDownloadCTA } from "@/components/ui/DesktopDownload";
 import { Logo } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { MagneticLink, buttonClass } from "@/components/ui/Button";
@@ -47,12 +47,21 @@ export function Nav() {
         <div className="flex items-center gap-1.5">
           <ThemeToggle />
           <StarButton className="hidden sm:inline-flex" />
-          <Link href="/app" className={buttonClass("ink", "sm", "group")}>
-            Open editor <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
-          </Link>
+          <NavDownload />
         </div>
       </nav>
     </header>
+  );
+}
+
+function NavDownload() {
+  const cta = useDownloadCTA();
+  return (
+    <TrackDownload>
+      <a href={cta.href} className={buttonClass("ink", "sm", "group")}>
+        <Download size={14} /> {cta.short}
+      </a>
+    </TrackDownload>
   );
 }
 
@@ -167,10 +176,7 @@ export function Hero() {
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.7 }}
           className="mt-8 flex flex-wrap items-center justify-center gap-3"
         >
-          <MagneticLink href="/app" cursor="Create">
-            Start creating, it&apos;s free
-            <ArrowRight size={17} className="transition-transform duration-300 group-hover:translate-x-1" />
-          </MagneticLink>
+          <DownloadButton />
           <MagneticLink href="#templates" variant="soft" cursor="Look">
             Browse templates
           </MagneticLink>
@@ -182,6 +188,8 @@ export function Hero() {
           transition={{ delay: 1.1, duration: 1 }}
           className="mt-6 flex items-center gap-4 font-mono text-[11px] tracking-[.12em] text-muted uppercase"
         >
+          <span>Windows · Mac · Linux</span>
+          <span className="h-1 w-1 rounded-full bg-muted/50" />
           <span>No sign-up</span>
           <span className="h-1 w-1 rounded-full bg-muted/50" />
           <span>Works offline</span>

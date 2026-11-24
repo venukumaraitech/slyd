@@ -43,6 +43,7 @@ export function MagneticLink({
   className,
   cursor,
   external,
+  download,
 }: {
   href: string;
   children: ReactNode;
@@ -51,13 +52,15 @@ export function MagneticLink({
   className?: string;
   cursor?: string;
   external?: boolean;
+  /** A file download: a plain link that stays on this page. */
+  download?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
   const x = useSpring(mx, { stiffness: 300, damping: 20 });
   const y = useSpring(my, { stiffness: 300, damping: 20 });
-  const Comp = external ? "a" : Link;
+  const Comp = external || download ? "a" : Link;
   return (
     <motion.div
       ref={ref}

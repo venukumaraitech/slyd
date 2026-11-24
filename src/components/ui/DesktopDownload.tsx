@@ -1,8 +1,9 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useSyncExternalStore, type ReactNode } from "react";
 import { Download } from "lucide-react";
 import { DESKTOP_DOWNLOADS, RELEASES_URL } from "@/lib/site";
+import { MagneticLink } from "./Button";
 import { cn } from "./cn";
 
 /** Remembered so carousel links on this site can offer to open in the app. */
@@ -83,5 +84,47 @@ export function DesktopDownload({ className, dark = false }: { className?: strin
         </a>
       </p>
     </div>
+  );
+}
+
+const OS_NAME = { windows: "Windows", mac: "Mac", linux: "Linux" } as const;
+
+/**
+ * The main download for the visitor's computer: Windows installer, Apple-silicon Mac
+ * (Intel and Linux ARM are listed in the #self-host section), Linux AppImage.
+ * null on phones and tablets, where the web app is the way in.
+ */
+export function useDesktopDownload(): { href: string; os: string } | null {
+  const os = useDesktopOS();
+  if (os === "other") return null;
+  const href = os === "windows" ? D.windows.file : os === "mac" ? D.macArm.file : D.linux.file;
+  return { href, os: OS_NAME[os] };
+}
+
+/** Wraps a download link so the site remembers the visitor has the app. */
+export function TrackDownload({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <span onClickCapture={markDownloaded} className={cn("contents", className)}>
+      {children}
+    </span>
+  );
+}
+
+/** Label and target for a "Download" button; phones and tablets go to the download section. */
+export function useDownloadCTA() {
+  const dl = useDesktopDownload();
+  return dl ? { href: dl.href, label: `Download for ${dl.os}`, short: "Download" } : { href: "/#self-host", label: "Download Slyd", short: "Download" };
+}
+
+/** The big "Download for <your OS>" button used across the landing page. */
+export function DownloadButton({ className, variant, cursor = "Get" }: { className?: string; variant?: "primary" | "soft"; cursor?: string }) {
+  const cta = useDownloadCTA();
+  const isFile = cta.href.startsWith("http");
+  return (
+    <TrackDownload>
+      <MagneticLink href={cta.href} download={isFile} variant={variant} cursor={cursor} className={className}>
+        <Download size={17} /> {cta.label}
+      </MagneticLink>
+    </TrackDownload>
   );
 }

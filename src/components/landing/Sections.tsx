@@ -11,7 +11,7 @@ import { Github } from "@/components/ui/BrandIcons";
 import { MagneticLink } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/components/ui/cn";
-import { DesktopDownload } from "@/components/ui/DesktopDownload";
+import { DesktopDownload, DownloadButton } from "@/components/ui/DesktopDownload";
 import { HeroShader } from "./HeroShader";
 import { CountUp, Eyebrow, Reveal, SectionHead, SplitWords } from "./primitives";
 import { demo } from "./demo";
@@ -250,9 +250,7 @@ export function Pricing() {
               ))}
             </ul>
             <div className="mt-10">
-              <MagneticLink href="/app" cursor="Go" className="bg-bg text-ink shadow-none hover:brightness-95" variant="soft">
-                Open the editor <ArrowRight size={16} />
-              </MagneticLink>
+              <DownloadButton cursor="Go" variant="soft" className="bg-bg text-ink shadow-none hover:brightness-95" />
             </div>
           </div>
         </Reveal>
@@ -355,12 +353,10 @@ export function FinalCta() {
           <SplitWords text="Make the next one *unskippable.*" />
         </h2>
         <Reveal delay={0.2}>
-          <p className="mx-auto mt-6 max-w-md text-[17px] text-ink-2">Open the editor and start. Your first carousel can go out today.</p>
+          <p className="mx-auto mt-6 max-w-md text-[17px] text-ink-2">Download Slyd and start. Your first carousel can go out today.</p>
         </Reveal>
         <Reveal delay={0.3} className="mt-10 flex flex-wrap justify-center gap-3">
-          <MagneticLink href="/app" cursor="Create">
-            Start creating <ArrowRight size={17} />
-          </MagneticLink>
+          <DownloadButton cursor="Create" />
           <MagneticLink href={REPO_URL} external variant="soft" cursor="Star">
             <Github size={17} /> Star on GitHub
           </MagneticLink>
@@ -372,7 +368,7 @@ export function FinalCta() {
 
 export function Footer() {
   const cols = [
-    { h: "Product", l: [["Editor", "/app"], ["For AI agents", "/agents"], ["Templates", "#templates"], ["FAQ", "#faq"], ["Privacy", "/privacy"]] },
+    { h: "Product", l: [["Download", "#self-host"], ["For AI agents", "/agents"], ["Templates", "#templates"], ["FAQ", "#faq"], ["Privacy", "/privacy"]] },
     { h: "Open source", l: [["Desktop app", "#self-host"], ["GitHub", REPO_URL], ["GitLab mirror", GITLAB_REPO_URL], ["Report a bug", ISSUES_URL], ["MIT License", LICENSE_URL]] },
     { h: "Photos by", l: [["Unsplash", "https://unsplash.com"], ["Pexels", "https://pexels.com"], ["Openverse", "https://openverse.org"], ["Picsum", "https://picsum.photos"]] },
   ];
