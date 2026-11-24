@@ -11,6 +11,7 @@ import { Github } from "@/components/ui/BrandIcons";
 import { MagneticLink } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/components/ui/cn";
+import { DesktopDownload } from "@/components/ui/DesktopDownload";
 import { HeroShader } from "./HeroShader";
 import { CountUp, Eyebrow, Reveal, SectionHead, SplitWords } from "./primitives";
 import { demo } from "./demo";
@@ -294,7 +295,7 @@ const FAQ = [
   ["Can I use the stock photos commercially?", "Unsplash and Pexels photos are free for commercial use under their licenses. Openverse results are limited to licenses that allow commercial use and modification. Slyd saves the credit with every photo, so attribution is one glance away."],
   ["Do I need an API key for photos?", "No. Openverse and Picsum work without one. To search Unsplash or Pexels too, paste your own free key in Settings. It stays in your browser."],
   ["What sizes can I export?", "Square 1:1, portrait 4:5, tall 3:4, story 9:16 and wide 16:9, all 1080px wide, at 1×, 2× or 3×. PDF export is made for LinkedIn document posts."],
-  ["Can I run Slyd myself?", "Yes, and please do if you use it often. One command, docker run -d -p 3000:3000 ghcr.io/venukumaraitech/slyd:latest, starts the full app at localhost:3000, including your own MCP server for AI agents at localhost:3000/mcp. Node.js works too; see the README."],
+  ["Can I run Slyd myself?", "Yes, and please do if you use it often. The desktop app for Windows, Mac and Linux is the easiest way: it includes your own MCP server at localhost:3737/mcp. On a server, one command, docker run -d -p 3000:3000 ghcr.io/venukumaraitech/slyd:latest, starts the full app at localhost:3000, including your own MCP server for AI agents at localhost:3000/mcp. Node.js works too; see the README."],
   ["Why laptop-first?", "Carousels are written, not tapped. Slyd is designed around a keyboard, a trackpad and a 13–16\" screen, and every action has a shortcut. Phones get a friendly heads-up."],
   ["Is there AI?", "Not yet, on purpose. The editor comes first. An optional AI layer for drafting hooks and outlines is on the roadmap."],
 ];
@@ -372,7 +373,7 @@ export function FinalCta() {
 export function Footer() {
   const cols = [
     { h: "Product", l: [["Editor", "/app"], ["For AI agents", "/agents"], ["Templates", "#templates"], ["FAQ", "#faq"], ["Privacy", "/privacy"]] },
-    { h: "Open source", l: [["Run your own", "#self-host"], ["GitHub", REPO_URL], ["GitLab mirror", GITLAB_REPO_URL], ["Report a bug", ISSUES_URL], ["MIT License", LICENSE_URL]] },
+    { h: "Open source", l: [["Desktop app", "#self-host"], ["GitHub", REPO_URL], ["GitLab mirror", GITLAB_REPO_URL], ["Report a bug", ISSUES_URL], ["MIT License", LICENSE_URL]] },
     { h: "Photos by", l: [["Unsplash", "https://unsplash.com"], ["Pexels", "https://pexels.com"], ["Openverse", "https://openverse.org"], ["Picsum", "https://picsum.photos"]] },
   ];
   return (
@@ -466,20 +467,21 @@ export function SelfHost() {
   };
   const points = [
     { t: "Your machine, your carousels", d: "The editor, your projects and the MCP server all run on your computer." },
-    { t: "Your own MCP for agents", d: "Point Claude Desktop, Claude Code, Cursor or VS Code at localhost:3000/mcp." },
+    { t: "Your own MCP for agents", d: "While Slyd is open, Claude Desktop, Claude Code, Cursor or VS Code can use it at localhost:3737/mcp. Links your agent makes open straight in the app." },
     { t: "Works offline", d: "No account, no limits, nothing to break when the internet does." },
   ];
   return (
     <section id="self-host" className="mx-auto max-w-6xl scroll-mt-24 px-6 py-24">
       <div className="grid gap-12 lg:grid-cols-[1fr_1.05fr] lg:items-center">
         <div>
-          <Eyebrow>Run your own</Eyebrow>
+          <Eyebrow>Desktop app</Eyebrow>
           <h2 className="mt-4 text-[clamp(2rem,4vw,3.2rem)] leading-[1.02] font-semibold tracking-[-0.035em] text-balance">
-            <SplitWords text="Slyd on *your* machine. One command." />
+            <SplitWords text="Slyd on *your* machine." />
           </h2>
           <p className="mt-5 max-w-md text-[16px] leading-relaxed text-muted">
-            Slyd is free, and this site runs on a hobby budget. If you use it often, run your own copy. It&apos;s the same app, private by default, with your own MCP server for your AI agent.
+            Slyd is free, and this site runs on a hobby budget. If you use it often, get the desktop app. It&apos;s the same Slyd, private by default, with its own MCP server for your AI agent.
           </p>
+          <DesktopDownload className="mt-7" />
           <ul className="mt-7 flex flex-col gap-3.5">
             {points.map((p) => (
               <li key={p.t} className="flex gap-3">
@@ -504,7 +506,7 @@ export function SelfHost() {
               </span>
             </div>
             <div className="p-5 font-mono text-[13px] leading-relaxed sm:p-6">
-              <div className="text-bg/45"># 1. Run Slyd</div>
+              <div className="text-bg/45"># Prefer a server? Run Slyd with Docker</div>
               <div className="mt-1 flex items-start gap-3">
                 <span className="min-w-0 flex-1 [overflow-wrap:anywhere]">
                   <span className="text-accent">$</span> {DOCKER_RUN}
@@ -513,9 +515,9 @@ export function SelfHost() {
                   {copied ? <Check size={13} /> : <Copy size={13} />} {copied ? "Copied" : "Copy"}
                 </button>
               </div>
-              <div className="mt-5 text-bg/45"># 2. Open the editor</div>
+              <div className="mt-5 text-bg/45"># Open the editor</div>
               <div className="mt-1">http://localhost:3000</div>
-              <div className="mt-5 text-bg/45"># 3. Connect your AI agent (Claude Code shown)</div>
+              <div className="mt-5 text-bg/45"># Connect your AI agent (Claude Code shown)</div>
               <div className="mt-1 [overflow-wrap:anywhere]">
                 <span className="text-accent">$</span> claude mcp add --transport http slyd http://localhost:3000/mcp
               </div>

@@ -10,7 +10,8 @@ gsap.registerPlugin(ScrollTrigger);
 /** Lenis drives scrolling; GSAP's ticker drives Lenis so ScrollTrigger stays in sync. */
 export function SmoothScroll() {
   useEffect(() => {
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // No glide in the desktop app: it should scroll like any other app on the computer.
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches || /SlydDesktop/.test(navigator.userAgent)) return;
     const lenis = new Lenis({ duration: 1.15, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true });
     lenis.on("scroll", ScrollTrigger.update);
     const tick = (time: number) => lenis.raf(time * 1000);

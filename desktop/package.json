@@ -1,0 +1,92 @@
+{
+  "name": "slyd-desktop",
+  "productName": "Slyd",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Slyd carousel maker as a desktop app, with a local MCP server for AI agents.",
+  "license": "MIT",
+  "author": {
+    "name": "Venu Kumar Mutyala",
+    "url": "https://venukumar.vercel.app"
+  },
+  "homepage": "https://tryslyd.vercel.app",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --publish never",
+    "icons": "node ../scripts/desktop-icons.mjs"
+  },
+  "devDependencies": {
+    "electron": "^45.4.1",
+    "electron-builder": "^26.18.0"
+  },
+  "build": {
+    "appId": "app.slyd.desktop",
+    "productName": "Slyd",
+    "artifactName": "Slyd-${os}-${arch}.${ext}",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "mcp-bridge.js",
+      "package.json",
+      "build/icon.png"
+    ],
+    "asar": true,
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "artifactName": "Slyd-Setup-${arch}.${ext}"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "category": "public.app-category.graphics-design",
+      "identity": "-",
+      "icon": "build/icon-mac.png"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "category": "Graphics",
+      "synopsis": "Carousel maker with a local MCP server for AI agents",
+      "icon": "build/icon.png"
+    },
+    "afterPack": "./afterPack.js",
+    "protocols": [
+      {
+        "name": "Slyd",
+        "schemes": [
+          "slyd"
+        ]
+      }
+    ]
+  }
+}

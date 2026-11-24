@@ -80,21 +80,58 @@ async function resolvePhotos(project: Project, pending: PendingPhoto[], onProgre
   );
 }
 
+/** Set when someone downloads the desktop app here, or picks "Always open links in the app". */
+export const HAS_APP_KEY = "slyd-has-desktop-app";
+const APP_PREF = "slyd-open-links-in-app";
+const readLocal = (k: string) => {
+  try {
+    return localStorage.getItem(k);
+  } catch {
+    return null;
+  }
+};
+const writeLocal = (k: string, v: string) => {
+  try {
+    if (v) localStorage.setItem(k, v);
+    else localStorage.removeItem(k);
+  } catch {}
+};
+/** Offer the app only on the web, on a computer, to someone who has (probably) got it. */
+const wantsAppChoice = () =>
+  !/SlydDesktop|Android|iPhone|iPad/.test(navigator.userAgent) && (readLocal(HAS_APP_KEY) === "1" || readLocal(APP_PREF) === "always");
+
 export function OpenSpec() {
   const router = useRouter();
   const [step, setStep] = useState<Step>("read");
   const [photos, setPhotos] = useState<{ done: number; total: number }>({ done: 0, total: 0 });
   const [error, setError] = useState<{ title: string; details: string[] } | null>(null);
   const [updating, setUpdating] = useState(false);
+  const [handoff, setHandoff] = useState<{ link: string; run: () => void } | null>(null);
+  const [sent, setSent] = useState(false);
   const ran = useRef(false);
 
   useEffect(() => {
     if (ran.current) return;
     ran.current = true;
-    (async () => {
-      const hash = window.location.hash;
-      // Clear the fragment right away: the carousel's text shouldn't linger in history.
-      history.replaceState(null, "", window.location.pathname);
+    const hash = window.location.hash;
+    const path = window.location.pathname;
+    // Clear the fragment right away: the carousel's text shouldn't linger in history.
+    history.replaceState(null, "", path);
+    const run = () => openHere(hash);
+    // People with the desktop app can send links from the website straight into it.
+    if (hash.length >= 4 && wantsAppChoice()) {
+      const link = `slyd://open${path.startsWith("/c/") ? path : "/c/carousel"}${hash}`;
+      setHandoff({ link, run });
+      if (readLocal(APP_PREF) === "always") {
+        window.location.href = link;
+        setSent(true);
+      }
+      return;
+    }
+    run();
+
+    function openHere(hash: string) {
+      (async () => {
       if (!hash || hash.length < 4) {
         setError({ title: "This link is empty", details: ["Ask your agent to create the carousel again, or start one from the dashboard."] });
         return;
@@ -145,15 +182,63 @@ export function OpenSpec() {
       }
       await saveProject(project);
       router.replace(`/app/edit?id=${project.id}${open}`);
-    })().catch((e) => setError({ title: "Something went wrong", details: [String((e as Error)?.message ?? e)] }));
+      })().catch((e) => setError({ title: "Something went wrong", details: [String((e as Error)?.message ?? e)] }));
+    }
   }, [router]);
+
+  const toApp = (always: boolean) => {
+    if (!handoff) return;
+    if (always) writeLocal(APP_PREF, "always");
+    window.location.href = handoff.link;
+    setSent(true);
+  };
+  const here = () => {
+    if (!handoff) return;
+    writeLocal(APP_PREF, "");
+    const { run } = handoff;
+    setHandoff(null);
+    run();
+  };
 
   const idx = STEPS.findIndex((s) => s.id === step);
 
   return (
     <div className="grid min-h-screen place-items-center px-6">
       <AnimatePresence mode="wait">
-        {error ? (
+        {handoff ? (
+          <motion.div key="choose" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="w-full max-w-sm text-center">
+            <LogoMark className="mx-auto h-14 w-14" />
+            <h1 className="mt-6 text-[22px] font-semibold tracking-tight">{sent ? "Opened in the Slyd app" : "Open this carousel in…"}</h1>
+            {sent ? (
+              <>
+                <p className="mt-2 text-[13.5px] leading-relaxed text-muted">Your carousel is in the app. You can close this tab.</p>
+                <div className="mt-6 flex flex-col gap-2">
+                  <button onClick={() => toApp(false)} className="h-11 rounded-xl bg-panel text-[14px] font-medium ring-1 ring-line hover:ring-line-2">
+                    Nothing happened? Try again
+                  </button>
+                  <button onClick={here} className="h-10 rounded-xl text-[13px] text-ink-2 hover:bg-line">
+                    Open it here in the browser instead
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="mt-2 text-[13.5px] leading-relaxed text-muted">The Slyd app keeps it with your other carousels, on your computer.</p>
+                <div className="mt-6 flex flex-col gap-2">
+                  <button onClick={() => toApp(false)} className="h-11 rounded-xl bg-accent text-[14px] font-medium text-accent-ink hover:opacity-90">
+                    The Slyd app
+                  </button>
+                  <button onClick={here} className="h-11 rounded-xl bg-panel text-[14px] font-medium ring-1 ring-line hover:ring-line-2">
+                    This browser
+                  </button>
+                  <button onClick={() => toApp(true)} className="mt-1 text-[12.5px] text-muted underline decoration-line-2 underline-offset-4 hover:text-ink">
+                    Always open links in the app
+                  </button>
+                </div>
+              </>
+            )}
+          </motion.div>
+        ) : error ? (
           <motion.div key="err" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md rounded-3xl bg-panel p-7 shadow-md">
             <span className="grid h-10 w-10 place-items-center rounded-full bg-red-500/10 text-red-500">
               <AlertTriangle size={18} />

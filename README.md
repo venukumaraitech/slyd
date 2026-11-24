@@ -9,10 +9,11 @@
 A free, open source carousel maker for Instagram, LinkedIn and X.<br />
 Design in your browser, or let your AI agent build the carousel for you.
 
-[**Run your own (one command)**](#run-your-own-slyd) · [**Try it online**](https://tryslyd.vercel.app) · [**Connect your AI agent**](#create-carousels-with-your-ai-agent)
+[**Download the desktop app**](#desktop-app) · [**Try it online**](https://tryslyd.vercel.app) · [**Connect your AI agent**](#create-carousels-with-your-ai-agent)
 
 [![Live](https://img.shields.io/badge/live-tryslyd.vercel.app-FF5A1F?style=flat-square)](https://tryslyd.vercel.app)
-[![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fvenukumaraitech%2Fslyd-141311?style=flat-square&logo=docker)](#run-your-own-slyd)
+[![Desktop](https://img.shields.io/badge/desktop-Windows%20%C2%B7%20Mac%20%C2%B7%20Linux-141311?style=flat-square)](#desktop-app)
+[![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fvenukumaraitech%2Fslyd-141311?style=flat-square&logo=docker)](#run-your-own-slyd-server)
 [![MCP](https://img.shields.io/badge/MCP-ready-141311?style=flat-square)](#create-carousels-with-your-ai-agent)
 [![License: MIT](https://img.shields.io/badge/license-MIT-141311?style=flat-square)](./LICENSE)
 [![Next.js](https://img.shields.io/badge/Next.js-15-141311?style=flat-square&logo=nextdotjs)](https://nextjs.org)
@@ -31,11 +32,28 @@ Most carousel tools want a subscription, an account and your attention. Slyd jus
 - **Built for laptops.** Keyboard-first, with a shortcut for every action.
 - **Agent-ready.** Claude, ChatGPT, Cursor and VS Code can create carousels for you through MCP.
 
-## Run your own Slyd
+## Desktop app
 
-Slyd is free and the public site runs on a hobby budget, so **please run your own copy** if you use it regularly. It takes one command, and everything (the editor, your projects and the MCP server for your AI agent) then lives on your machine.
+Slyd is free and the public site runs on a hobby budget, so **if you use it regularly, please get the desktop app**. It's the same Slyd, and everything (the editor, your projects and the MCP server for your AI agent) lives on your computer.
 
-**Docker** (recommended):
+| System | Download |
+| --- | --- |
+| **Windows** | [Slyd-Setup-x64.exe](https://github.com/venukumaraitech/slyd/releases/latest/download/Slyd-Setup-x64.exe) |
+| **Mac** (Apple silicon) | [Slyd-mac-arm64.dmg](https://github.com/venukumaraitech/slyd/releases/latest/download/Slyd-mac-arm64.dmg) |
+| **Mac** (Intel) | [Slyd-mac-x64.dmg](https://github.com/venukumaraitech/slyd/releases/latest/download/Slyd-mac-x64.dmg) |
+| **Linux** | [Slyd-linux-x86_64.AppImage](https://github.com/venukumaraitech/slyd/releases/latest/download/Slyd-linux-x86_64.AppImage) · [ARM](https://github.com/venukumaraitech/slyd/releases/latest/download/Slyd-linux-arm64.AppImage) |
+
+While Slyd is open, your AI agent can use it at **http://localhost:3737/mcp** ([setup below](#create-carousels-with-your-ai-agent)), and the carousel links it hands you open straight in the app. **AI agents → Connect to Claude Desktop** sets up Claude Desktop in one click. Slyd checks GitHub for new versions and tells you when one is out.
+
+> **First launch:** the app isn't code-signed yet. On Windows, if SmartScreen appears, choose **More info → Run anyway**. On a Mac, right-click Slyd in Applications and choose **Open**; if macOS says it's damaged, run `xattr -cr /Applications/Slyd.app` once.
+
+Carousels made on the website stay in that browser. To move one into the app, open it on the site, choose **Export → .slyd.json**, then **Import** it in the app.
+
+## Run your own Slyd server
+
+Prefer a server, or a machine without a desktop? One command runs the whole app.
+
+**Docker:**
 
 ```bash
 docker run -d -p 3000:3000 --name slyd --restart unless-stopped ghcr.io/venukumaraitech/slyd:latest
@@ -94,19 +112,21 @@ Even on the public site, Slyd does its work in your browser: after the first vis
 
 Slyd includes a [Model Context Protocol](https://modelcontextprotocol.io) server, so Claude, ChatGPT, Cursor and VS Code can make carousels for you. No API key needed.
 
-**Use your own, local MCP server** (after [running your own Slyd](#run-your-own-slyd)):
+**Use your own, local MCP server** with the [desktop app](#desktop-app) open:
 
 ```
-http://localhost:3000/mcp
+http://localhost:3737/mcp
 ```
+
+Running the [Docker image](#run-your-own-slyd-server) instead? Use `http://localhost:3000/mcp` in the configs below.
 
 | Client | Connect to your local Slyd |
 | --- | --- |
-| **Claude Code** | `claude mcp add --transport http slyd http://localhost:3000/mcp` |
-| **Claude Desktop** | Add to `claude_desktop_config.json` (Settings → Developer → Edit config), then restart:<br>`{"mcpServers":{"slyd":{"command":"npx","args":["-y","mcp-remote","http://localhost:3000/mcp"]}}}` |
-| **Cursor** | `~/.cursor/mcp.json`: `{"mcpServers":{"slyd":{"url":"http://localhost:3000/mcp"}}}` |
-| **VS Code** | `.vscode/mcp.json`: `{"servers":{"slyd":{"type":"http","url":"http://localhost:3000/mcp"}}}` |
-| **Anything else** | Streamable HTTP at `http://localhost:3000/mcp`, or `npx -y mcp-remote http://localhost:3000/mcp` |
+| **Claude Code** | `claude mcp add --transport http slyd http://localhost:3737/mcp` |
+| **Claude Desktop** | In the Slyd app: **AI agents → Connect to Claude Desktop**, then restart Claude. (Docker: add `{"mcpServers":{"slyd":{"command":"npx","args":["-y","mcp-remote","http://localhost:3000/mcp"]}}}` to `claude_desktop_config.json`.) |
+| **Cursor** | `~/.cursor/mcp.json`: `{"mcpServers":{"slyd":{"url":"http://localhost:3737/mcp"}}}` |
+| **VS Code** | `.vscode/mcp.json`: `{"servers":{"slyd":{"type":"http","url":"http://localhost:3737/mcp"}}}` |
+| **Anything else** | Streamable HTTP at `http://localhost:3737/mcp`, or `npx -y mcp-remote http://localhost:3737/mcp` |
 
 > **claude.ai and ChatGPT on the web** connect from their own cloud, so they can't reach `localhost`. Use Claude Desktop or Claude Code with your local server, put your Slyd on a public URL, or use the shared server below.
 
@@ -169,9 +189,20 @@ npm run dev          # http://localhost:3000
 
 Build the Docker image yourself with `docker build -t slyd .`. It also deploys to Vercel with no extra configuration.
 
+**Desktop app** (Electron, in [`desktop/`](./desktop)): it runs Slyd's own server bundle on this computer, behind `localhost:3737`.
+
+```bash
+STANDALONE=1 NEXT_PUBLIC_SITE_URL=http://localhost:3737 npm run build
+npm run desktop:server           # copies the server into desktop/server
+cd desktop && npm install
+npm start                        # run it, or: npm run dist   (installer in desktop/dist)
+```
+
+Pushing a `v*` tag builds the Windows, Mac and Linux apps and attaches them to a GitHub release.
+
 ## Built with
 
-Next.js 15 · React 19 · TypeScript · Tailwind CSS 4 · Motion · GSAP · WebGL · Zustand · Immer · Zod · MCP SDK · html-to-image · jsPDF
+Next.js 15 · React 19 · Electron · TypeScript · Tailwind CSS 4 · Motion · GSAP · WebGL · Zustand · Immer · Zod · MCP SDK · html-to-image · jsPDF
 
 <details>
 <summary><b>Architecture</b></summary>

@@ -8,7 +8,8 @@ import { Logo } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { buttonClass } from "@/components/ui/Button";
 import { cn } from "@/components/ui/cn";
-import { SITE_URL } from "@/lib/site";
+import { DesktopDownload } from "@/components/ui/DesktopDownload";
+import { DESKTOP_MCP_URL, SITE_URL } from "@/lib/site";
 
 const MCP_URL = `${SITE_URL}/mcp`;
 
@@ -65,7 +66,7 @@ const Steps = ({ items }: { items: ReactNode[] }) => (
 );
 
 const DOCKER_RUN = "docker run -d -p 3000:3000 --name slyd --restart unless-stopped ghcr.io/venukumaraitech/slyd:latest";
-const LOCAL_MCP = "http://localhost:3000/mcp";
+const LOCAL_MCP = DESKTOP_MCP_URL;
 
 const CLIENTS: Client[] = [
   {
@@ -75,25 +76,24 @@ const CLIENTS: Client[] = [
     body: (c) => (
       <div className="flex flex-col gap-5">
         <p className="text-[14px] leading-relaxed text-ink-2">
-          Run Slyd on your computer and connect your agent to it. It&apos;s free, private, works offline, and keeps the shared server free for people trying Slyd out.
+          Run Slyd on your computer and connect your agent to it. It&apos;s free, private, works offline, and keeps the shared server free for people trying Slyd out. Carousel links your agent makes open straight in the app.
         </p>
-        <CopyBlock id="local-docker" label="1. Start Slyd (needs Docker)" text={DOCKER_RUN} copy={c.copy} copied={c.copied} mono />
-        <p className="-mt-2 text-[12.5px] text-muted">
-          Then open <b className="text-ink-2">http://localhost:3000</b>. No Docker? <a className="underline underline-offset-2 hover:text-ink" href="https://github.com/venukumaraitech/slyd#run-your-own-slyd" target="_blank" rel="noreferrer">Run it with Node.js</a> instead.
-        </p>
+        <div>
+          <div className="mb-2 text-[12.5px] font-medium text-ink-2">1. Get the Slyd desktop app, and keep it open while your agent works</div>
+          <DesktopDownload />
+        </div>
         <CopyBlock id="local-cc" label="2. Connect Claude Code" text={`claude mcp add --transport http slyd ${LOCAL_MCP}`} copy={c.copy} copied={c.copied} mono />
-        <CopyBlock
-          id="local-desktop"
-          label="…or Claude Desktop: Settings → Developer → Edit config, add this, then restart"
-          text={JSON.stringify({ mcpServers: { slyd: { command: "npx", args: ["-y", "mcp-remote", LOCAL_MCP] } } }, null, 2)}
-          copy={c.copy}
-          copied={c.copied}
-          mono
-        />
+        <div className="rounded-xl bg-panel-2 px-4 py-3 text-[13px] leading-relaxed text-ink-2">
+          <b className="font-semibold text-ink">Claude Desktop:</b> in the Slyd app, choose <b className="font-medium text-ink">AI agents → Connect to Claude Desktop</b>, then restart Claude. No Node.js or config editing, and Claude opens Slyd for you when it&apos;s closed.
+        </div>
         <CopyBlock id="local-cursor" label="…or Cursor (~/.cursor/mcp.json)" text={JSON.stringify({ mcpServers: { slyd: { url: LOCAL_MCP } } }, null, 2)} copy={c.copy} copied={c.copied} mono />
         <CopyBlock id="local-vscode" label="…or VS Code (.vscode/mcp.json)" text={JSON.stringify({ servers: { slyd: { type: "http", url: LOCAL_MCP } } }, null, 2)} copy={c.copy} copied={c.copied} mono />
         <p className="rounded-xl bg-panel-2 px-4 py-3 text-[12.5px] leading-relaxed text-muted">
           claude.ai and ChatGPT on the web connect from their own cloud, so they can&apos;t reach <code className="font-mono">localhost</code>. Use Claude Desktop or Claude Code with your local Slyd, or the shared server in the other tabs.
+        </p>
+        <p className="-mt-2 text-[12.5px] leading-relaxed text-muted">
+          Running Slyd on a server instead?{" "}
+          <span className="font-mono [overflow-wrap:anywhere]">{DOCKER_RUN}</span> starts it at localhost:3000; use <code className="font-mono">localhost:3000/mcp</code> in the configs above.
         </p>
       </div>
     ),
@@ -239,7 +239,7 @@ export function AgentsPage() {
         >
           <Zap size={16} className="shrink-0 text-accent" />
           <span className="flex-1 text-[13.5px] leading-snug text-ink-2">
-            <b className="font-semibold text-ink">Using Slyd a lot? Run your own.</b> One Docker command, then connect your agent to <code className="font-mono text-[12.5px]">localhost:3000/mcp</code>. Private, offline, and it keeps the shared server free for everyone.
+            <b className="font-semibold text-ink">Using Slyd a lot? Get the desktop app.</b> It runs its own MCP server at <code className="font-mono text-[12.5px]">localhost:3737/mcp</code>. Private, offline, and it keeps the shared server free for everyone.
           </span>
           <ArrowRight size={15} className="shrink-0 text-accent transition-transform group-hover:translate-x-0.5" />
         </button>

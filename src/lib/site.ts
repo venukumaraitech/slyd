@@ -39,3 +39,15 @@ export const AUTHOR = {
     { label: "Instagram", href: "https://www.instagram.com/itsvenukumar" },
   ],
 } as const;
+
+/** Desktop app installers, attached to each GitHub release under fixed names. */
+const download = (file: string) => `${GITHUB_REPO_URL}/releases/latest/download/${file}`;
+export const RELEASES_URL = `${GITHUB_REPO_URL}/releases/latest`;
+export const DESKTOP_MCP_URL = "http://localhost:3737/mcp";
+export const DESKTOP_DOWNLOADS = {
+  windows: { label: "Windows", file: download("Slyd-Setup-x64.exe") },
+  macArm: { label: "Mac (Apple silicon)", file: download("Slyd-mac-arm64.dmg") },
+  macIntel: { label: "Mac (Intel)", file: download("Slyd-mac-x64.dmg") },
+  linux: { label: "Linux (AppImage)", file: download("Slyd-linux-x86_64.AppImage") },
+  linuxArm: { label: "Linux ARM (AppImage)", file: download("Slyd-linux-arm64.AppImage") },
+} as const;
