@@ -23,10 +23,6 @@ const withCors = (res: Response) => {
 };
 
 async function handle(req: Request) {
-  // A person opening /mcp in a browser gets the setup page, not a protocol error.
-  if (req.method === "GET" && (req.headers.get("accept") ?? "").includes("text/html")) {
-    return Response.redirect(new URL("/agents", req.url), 302);
-  }
   const server = createSlydServer();
   const transport = new WebStandardStreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
   await server.connect(transport);
@@ -38,9 +34,25 @@ async function handle(req: Request) {
   }
 }
 
-export const GET = handle;
+/**
+ * Stateless server: there is no server-to-client stream and no session to end. The MCP spec
+ * says to answer GET/DELETE with 405 then. (Answering GET with an SSE stream that closes at
+ * once made clients reconnect in a loop: millions of function invocations for nothing.)
+ */
+function notAllowed(req: Request) {
+  if (req.method === "GET" && (req.headers.get("accept") ?? "").includes("text/html")) {
+    return Response.redirect(new URL("/agents", req.url), 302);
+  }
+  return withCors(new Response(JSON.stringify({ jsonrpc: "2.0", error: { code: -32000, message: "Method not allowed: this server is stateless; use POST." }, id: null }), {
+    status: 405,
+    headers: { "Content-Type": "application/json", Allow: "POST, OPTIONS" },
+  }));
+}
+
+export const GET = notAllowed;
 export const POST = handle;
-export const DELETE = handle;
+export const DELETE = notAllowed;
 export function OPTIONS() {
-  return new Response(null, { status: 204, headers: CORS });
+  // Browsers may reuse this preflight answer for a day instead of asking before every call.
+  return new Response(null, { status: 204, headers: { ...CORS, "Access-Control-Max-Age": "86400" } });
 }
