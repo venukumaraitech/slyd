@@ -22,8 +22,20 @@ const withCors = (res: Response) => {
   return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
 };
 
+/**
+ * The address people reach this server at: PUBLIC_URL if set, else the request's own
+ * host (behind a proxy, X-Forwarded-*). Self-hosted copies then link to themselves.
+ */
+function publicOrigin(req: Request) {
+  if (process.env.PUBLIC_URL) return process.env.PUBLIC_URL.replace(/\/$/, "");
+  const url = new URL(req.url);
+  const host = req.headers.get("x-forwarded-host")?.split(",")[0].trim() || req.headers.get("host") || url.host;
+  const proto = req.headers.get("x-forwarded-proto")?.split(",")[0].trim() || url.protocol.replace(":", "");
+  return `${proto}://${host}`;
+}
+
 async function handle(req: Request) {
-  const server = createSlydServer();
+  const server = createSlydServer(publicOrigin(req));
   const transport = new WebStandardStreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
   await server.connect(transport);
   try {

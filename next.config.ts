@@ -6,6 +6,13 @@ const nextConfig: NextConfig = {
   //   NEXT_DIST_DIR=.next-build npm run build
   distDir: process.env.NEXT_DIST_DIR || ".next",
   poweredByHeader: false,
+  // Self-contained server bundle for the Docker image (STANDALONE=1 npm run build).
+  ...(process.env.STANDALONE === "1" ? { output: "standalone" as const } : {}),
+  // Carousel links (/c/<name>#…) are the static /app/new page: the name is a label and the
+  // carousel itself is in the #fragment, so no server work is needed to open one.
+  async rewrites() {
+    return [{ source: "/c/:name", destination: "/app/new" }];
+  },
   eslint: { ignoreDuringBuilds: true },
   experimental: {
     // Import only the pieces we use from these barrel-heavy packages.

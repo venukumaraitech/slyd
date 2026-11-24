@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ArrowRight, Bookmark, Check, GraduationCap, Heart, Megaphone, MessageCircle, Palette, Plus, Rocket, Send, Sparkles, X } from "lucide-react";
+import { ArrowRight, Bookmark, Check, Copy, GraduationCap, HardDrive, Heart, Megaphone, MessageCircle, Palette, Plus, Rocket, Send, Sparkles, X } from "lucide-react";
 import { ScaledSlide } from "@/components/slide/SlideRenderer";
 import { Github } from "@/components/ui/BrandIcons";
 import { MagneticLink } from "@/components/ui/Button";
@@ -294,6 +294,7 @@ const FAQ = [
   ["Can I use the stock photos commercially?", "Unsplash and Pexels photos are free for commercial use under their licenses. Openverse results are limited to licenses that allow commercial use and modification. Slyd saves the credit with every photo, so attribution is one glance away."],
   ["Do I need an API key for photos?", "No. Openverse and Picsum work without one. To search Unsplash or Pexels too, paste your own free key in Settings. It stays in your browser."],
   ["What sizes can I export?", "Square 1:1, portrait 4:5, tall 3:4, story 9:16 and wide 16:9, all 1080px wide, at 1×, 2× or 3×. PDF export is made for LinkedIn document posts."],
+  ["Can I run Slyd myself?", "Yes, and please do if you use it often. One command, docker run -d -p 3000:3000 ghcr.io/venukumaraitech/slyd:latest, starts the full app at localhost:3000, including your own MCP server for AI agents at localhost:3000/mcp. Node.js works too; see the README."],
   ["Why laptop-first?", "Carousels are written, not tapped. Slyd is designed around a keyboard, a trackpad and a 13–16\" screen, and every action has a shortcut. Phones get a friendly heads-up."],
   ["Is there AI?", "Not yet, on purpose. The editor comes first. An optional AI layer for drafting hooks and outlines is on the roadmap."],
 ];
@@ -371,7 +372,7 @@ export function FinalCta() {
 export function Footer() {
   const cols = [
     { h: "Product", l: [["Editor", "/app"], ["For AI agents", "/agents"], ["Templates", "#templates"], ["FAQ", "#faq"], ["Privacy", "/privacy"]] },
-    { h: "Open source", l: [["GitHub", REPO_URL], ["GitLab mirror", GITLAB_REPO_URL], ["Report a bug", ISSUES_URL], ["MIT License", LICENSE_URL]] },
+    { h: "Open source", l: [["Run your own", "#self-host"], ["GitHub", REPO_URL], ["GitLab mirror", GITLAB_REPO_URL], ["Report a bug", ISSUES_URL], ["MIT License", LICENSE_URL]] },
     { h: "Photos by", l: [["Unsplash", "https://unsplash.com"], ["Pexels", "https://pexels.com"], ["Openverse", "https://openverse.org"], ["Picsum", "https://picsum.photos"]] },
   ];
   return (
@@ -447,6 +448,90 @@ export function Footer() {
         <span>Made with care on a laptop.</span>
       </div>
     </footer>
+  );
+}
+
+/* ------------------------------------------------------------ self-host -- */
+
+const DOCKER_RUN = "docker run -d -p 3000:3000 --name slyd ghcr.io/venukumaraitech/slyd:latest";
+
+export function SelfHost() {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(DOCKER_RUN);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1600);
+    } catch {}
+  };
+  const points = [
+    { t: "Your machine, your carousels", d: "The editor, your projects and the MCP server all run on your computer." },
+    { t: "Your own MCP for agents", d: "Point Claude Desktop, Claude Code, Cursor or VS Code at localhost:3000/mcp." },
+    { t: "Works offline", d: "No account, no limits, nothing to break when the internet does." },
+  ];
+  return (
+    <section id="self-host" className="mx-auto max-w-6xl scroll-mt-24 px-6 py-24">
+      <div className="grid gap-12 lg:grid-cols-[1fr_1.05fr] lg:items-center">
+        <div>
+          <Eyebrow>Run your own</Eyebrow>
+          <h2 className="mt-4 text-[clamp(2rem,4vw,3.2rem)] leading-[1.02] font-semibold tracking-[-0.035em] text-balance">
+            <SplitWords text="Slyd on *your* machine. One command." />
+          </h2>
+          <p className="mt-5 max-w-md text-[16px] leading-relaxed text-muted">
+            Slyd is free, and this site runs on a hobby budget. If you use it often, run your own copy. It&apos;s the same app, private by default, with your own MCP server for your AI agent.
+          </p>
+          <ul className="mt-7 flex flex-col gap-3.5">
+            {points.map((p) => (
+              <li key={p.t} className="flex gap-3">
+                <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-accent-soft text-accent">
+                  <Check size={13} strokeWidth={3} />
+                </span>
+                <span className="text-[14.5px] leading-relaxed text-ink-2">
+                  <b className="font-medium text-ink">{p.t}.</b> {p.d}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <Reveal>
+          <div className="overflow-hidden rounded-3xl bg-ink text-bg shadow-lg">
+            <div className="flex items-center gap-2 border-b border-bg/10 px-5 py-3">
+              <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
+              <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
+              <span className="h-3 w-3 rounded-full bg-[#28c840]" />
+              <span className="ml-2 flex items-center gap-1.5 font-mono text-[11.5px] text-bg/50">
+                <HardDrive size={12} /> Terminal
+              </span>
+            </div>
+            <div className="p-5 font-mono text-[13px] leading-relaxed sm:p-6">
+              <div className="text-bg/45"># 1. Run Slyd</div>
+              <div className="mt-1 flex items-start gap-3">
+                <span className="min-w-0 flex-1 [overflow-wrap:anywhere]">
+                  <span className="text-accent">$</span> {DOCKER_RUN}
+                </span>
+                <button onClick={copy} className="flex h-8 shrink-0 items-center gap-1.5 rounded-lg bg-bg/10 px-2.5 font-sans text-[12px] font-medium transition hover:bg-bg/20" aria-label="Copy the command">
+                  {copied ? <Check size={13} /> : <Copy size={13} />} {copied ? "Copied" : "Copy"}
+                </button>
+              </div>
+              <div className="mt-5 text-bg/45"># 2. Open the editor</div>
+              <div className="mt-1">http://localhost:3000</div>
+              <div className="mt-5 text-bg/45"># 3. Connect your AI agent (Claude Code shown)</div>
+              <div className="mt-1 [overflow-wrap:anywhere]">
+                <span className="text-accent">$</span> claude mcp add --transport http slyd http://localhost:3000/mcp
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-[13px] text-muted">
+            <a href={`${REPO_URL}#run-your-own-slyd`} target="_blank" rel="noreferrer" className="underline decoration-line-2 underline-offset-4 hover:text-ink hover:decoration-accent">
+              Docker Compose &amp; Node.js setup
+            </a>
+            <Link href="/agents" className="underline decoration-line-2 underline-offset-4 hover:text-ink hover:decoration-accent">
+              Claude Desktop, Cursor &amp; VS Code
+            </Link>
+          </div>
+        </Reveal>
+      </div>
+    </section>
   );
 }
 

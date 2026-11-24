@@ -1,0 +1,13 @@
+.git
+.github
+.next
+.next-*
+node_modules
+.launch
+.vercel
+.env*
+*.log
+Dockerfile
+docker-compose.yml
+README.md
+CONTRIBUTING.md

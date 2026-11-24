@@ -9,10 +9,11 @@
 A free, open source carousel maker for Instagram, LinkedIn and X.<br />
 Design in your browser, or let your AI agent build the carousel for you.
 
-[**Open Slyd**](https://tryslyd.vercel.app) · [**Connect your AI agent**](https://tryslyd.vercel.app/agents) · [**Agent docs**](https://tryslyd.vercel.app/llms.txt)
+[**Run your own (one command)**](#run-your-own-slyd) · [**Try it online**](https://tryslyd.vercel.app) · [**Connect your AI agent**](#create-carousels-with-your-ai-agent)
 
 [![Live](https://img.shields.io/badge/live-tryslyd.vercel.app-FF5A1F?style=flat-square)](https://tryslyd.vercel.app)
-[![MCP](https://img.shields.io/badge/MCP-ready-141311?style=flat-square)](https://tryslyd.vercel.app/agents)
+[![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fvenukumaraitech%2Fslyd-141311?style=flat-square&logo=docker)](#run-your-own-slyd)
+[![MCP](https://img.shields.io/badge/MCP-ready-141311?style=flat-square)](#create-carousels-with-your-ai-agent)
 [![License: MIT](https://img.shields.io/badge/license-MIT-141311?style=flat-square)](./LICENSE)
 [![Next.js](https://img.shields.io/badge/Next.js-15-141311?style=flat-square&logo=nextdotjs)](https://nextjs.org)
 [![No sign-up](https://img.shields.io/badge/sign--up-not%20required-141311?style=flat-square)](https://tryslyd.vercel.app/app)
@@ -29,6 +30,43 @@ Most carousel tools want a subscription, an account and your attention. Slyd jus
 - **Private by design.** No account and no uploads. Projects are saved in your browser.
 - **Built for laptops.** Keyboard-first, with a shortcut for every action.
 - **Agent-ready.** Claude, ChatGPT, Cursor and VS Code can create carousels for you through MCP.
+
+## Run your own Slyd
+
+Slyd is free and the public site runs on a hobby budget, so **please run your own copy** if you use it regularly. It takes one command, and everything (the editor, your projects and the MCP server for your AI agent) then lives on your machine.
+
+**Docker** (recommended):
+
+```bash
+docker run -d -p 3000:3000 --name slyd --restart unless-stopped ghcr.io/venukumaraitech/slyd:latest
+```
+
+Open **http://localhost:3000**. Your AI agent's MCP server is at **http://localhost:3000/mcp**.
+
+<details>
+<summary><b>Docker Compose, Node.js, or your own server</b></summary>
+
+**Docker Compose:** grab [`docker-compose.yml`](./docker-compose.yml) and run `docker compose up -d`.
+
+**Node.js 20+**, without Docker:
+
+```bash
+git clone https://github.com/venukumaraitech/slyd.git && cd slyd
+npm install
+npm run build && npm start      # http://localhost:3000
+```
+
+**On a server behind your own domain**, set `PUBLIC_URL` so the links your agent hands out point there:
+
+```bash
+docker run -d -p 3000:3000 -e PUBLIC_URL=https://slyd.example.com ghcr.io/venukumaraitech/slyd:latest
+```
+
+The image is built for `linux/amd64` and `linux/arm64` (Apple silicon, Raspberry Pi) on every release.
+
+</details>
+
+Even on the public site, Slyd does its work in your browser: after the first visit the app is cached locally, works offline, and your carousels never leave your machine.
 
 ## Features
 
@@ -54,19 +92,25 @@ Most carousel tools want a subscription, an account and your attention. Slyd jus
 
 ## Create carousels with your AI agent
 
-Slyd runs a hosted [Model Context Protocol](https://modelcontextprotocol.io) server. There's nothing to install and no API key to set up.
+Slyd includes a [Model Context Protocol](https://modelcontextprotocol.io) server, so Claude, ChatGPT, Cursor and VS Code can make carousels for you. No API key needed.
+
+**Use your own, local MCP server** (after [running your own Slyd](#run-your-own-slyd)):
 
 ```
-https://tryslyd.vercel.app/mcp
+http://localhost:3000/mcp
 ```
 
-| Client | Setup |
+| Client | Connect to your local Slyd |
 | --- | --- |
-| **Claude** (claude.ai, Desktop) | Settings → Connectors → *Add custom connector* → paste the URL |
-| **Claude Code** | `claude mcp add --transport http slyd https://tryslyd.vercel.app/mcp` |
-| **ChatGPT** | Settings → Apps & Connectors → *Create* → paste the URL, no authentication |
-| **Cursor** · **VS Code** | One-click install at [tryslyd.vercel.app/agents](https://tryslyd.vercel.app/agents) |
-| **Anything else** | Remote MCP over Streamable HTTP, or `npx -y mcp-remote https://tryslyd.vercel.app/mcp` |
+| **Claude Code** | `claude mcp add --transport http slyd http://localhost:3000/mcp` |
+| **Claude Desktop** | Add to `claude_desktop_config.json` (Settings → Developer → Edit config), then restart:<br>`{"mcpServers":{"slyd":{"command":"npx","args":["-y","mcp-remote","http://localhost:3000/mcp"]}}}` |
+| **Cursor** | `~/.cursor/mcp.json`: `{"mcpServers":{"slyd":{"url":"http://localhost:3000/mcp"}}}` |
+| **VS Code** | `.vscode/mcp.json`: `{"servers":{"slyd":{"type":"http","url":"http://localhost:3000/mcp"}}}` |
+| **Anything else** | Streamable HTTP at `http://localhost:3000/mcp`, or `npx -y mcp-remote http://localhost:3000/mcp` |
+
+> **claude.ai and ChatGPT on the web** connect from their own cloud, so they can't reach `localhost`. Use Claude Desktop or Claude Code with your local server, put your Slyd on a public URL, or use the shared server below.
+
+**Shared server** (handy for a quick try; please self-host for regular use): `https://tryslyd.vercel.app/mcp`. Add it in Claude or ChatGPT under Settings → Connectors → *Add custom connector*, with no authentication. One-click installs for Cursor and VS Code are on [tryslyd.vercel.app/agents](https://tryslyd.vercel.app/agents).
 
 Then ask for what you want:
 
@@ -108,7 +152,7 @@ Agents can use the whole editor: every template, layout, palette, font, texture 
 
 </details>
 
-## Run it yourself
+## Develop
 
 Requires Node.js 20 or later.
 
@@ -119,10 +163,11 @@ npm run dev          # http://localhost:3000
 
 | Variable | Purpose |
 | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | Public URL, used for links, share cards and the MCP server's links |
+| `PUBLIC_URL` | The address people reach your Slyd at, for the links the MCP server hands out. Defaults to the address of each request. |
+| `NEXT_PUBLIC_SITE_URL` | Build-time public URL for share cards and canonical links |
 | `NEXT_PUBLIC_UNSPLASH_ACCESS_KEY` · `NEXT_PUBLIC_PEXELS_API_KEY` | Optional stock photo keys. These end up in the browser, so don't set them on a public deployment. Visitors can add their own keys in Settings. |
 
-Deploys to Vercel with no extra configuration.
+Build the Docker image yourself with `docker build -t slyd .`. It also deploys to Vercel with no extra configuration.
 
 ## Built with
 

@@ -21,18 +21,19 @@ Nothing is stored on a server: the whole carousel travels inside the link.`;
 
 const pretty = (x: unknown) => JSON.stringify(x, null, 2);
 
-export function createSlydServer() {
+/** `siteUrl` is where this copy of Slyd is reachable, so self-hosted servers hand out links to themselves. */
+export function createSlydServer(siteUrl: string = SITE_URL) {
   const server = new McpServer(
     {
       name: "slyd",
       title: "Slyd — Carousel maker",
       version: "1.2.0",
-      websiteUrl: SITE_URL,
+      websiteUrl: siteUrl,
       // Shown by MCP clients (e.g. Claude's connector list) instead of a generic placeholder.
       icons: [
-        { src: `${SITE_URL}/icon-512.png`, mimeType: "image/png", sizes: ["512x512"] },
-        { src: `${SITE_URL}/icon-192.png`, mimeType: "image/png", sizes: ["192x192"] },
-        { src: `${SITE_URL}/icon.svg`, mimeType: "image/svg+xml", sizes: ["any"] },
+        { src: `${siteUrl}/icon-512.png`, mimeType: "image/png", sizes: ["512x512"] },
+        { src: `${siteUrl}/icon-192.png`, mimeType: "image/png", sizes: ["192x192"] },
+        { src: `${siteUrl}/icon.svg`, mimeType: "image/svg+xml", sizes: ["any"] },
       ],
     },
     { instructions: INSTRUCTIONS },
@@ -40,7 +41,7 @@ export function createSlydServer() {
 
   /** Shared by create and update: build the link and a short, readable summary. */
   const respond = async (parsed: CarouselSpec, updated: boolean) => {
-    const url = await specLink(parsed, SITE_URL);
+    const url = await specLink(parsed, siteUrl);
     const name = (parsed.title ?? (parsed.slides.find((s) => "title" in s && s.title) as { title?: string } | undefined)?.title ?? "your carousel").replace(/\*/g, "");
     const tips = lintSpec(parsed);
     const t = TEMPLATES.find((x) => x.id === (parsed.template ?? "editorial"))!;

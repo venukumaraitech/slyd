@@ -1,0 +1,12 @@
+# docker compose up -d   →   http://localhost:3000   ·   MCP for your AI agent: http://localhost:3000/mcp
+services:
+  slyd:
+    image: ghcr.io/venukumaraitech/slyd:latest
+    # Or build it yourself from this folder:
+    # build: .
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    # Behind your own domain? Set the public address so agent links point there:
+    # environment:
+    #   PUBLIC_URL: https://slyd.example.com

@@ -8,15 +8,31 @@ import { Github } from "./BrandIcons";
 import { cn } from "./cn";
 
 let cached: number | null | undefined;
+const KEY = "slyd-stars";
+const DAY = 86_400_000;
 
-/** "Star on GitHub" with the live count. Counts are shared across instances on the page. */
+/**
+ * "Star on GitHub" count, fetched by the browser straight from GitHub (no Slyd server
+ * involved) and remembered for a day, so a visitor makes at most one call a day.
+ */
 export function useStars() {
   const [stars, setStars] = useState<number | null | undefined>(cached);
   useEffect(() => {
     if (cached !== undefined) return;
-    fetch("/api/stars")
-      .then((r) => r.json())
-      .then((j) => setStars((cached = typeof j.stars === "number" ? j.stars : null)))
+    try {
+      const saved = JSON.parse(localStorage.getItem(KEY) ?? "null") as { n: number; at: number } | null;
+      if (saved && Date.now() - saved.at < DAY) return setStars((cached = saved.n));
+    } catch {}
+    const repo = GITHUB_REPO_URL.replace("https://github.com/", "");
+    fetch(`https://api.github.com/repos/${repo}`, { headers: { Accept: "application/vnd.github+json" } })
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((j: { stargazers_count?: number }) => {
+        const n = typeof j.stargazers_count === "number" ? j.stargazers_count : null;
+        setStars((cached = n));
+        try {
+          if (n !== null) localStorage.setItem(KEY, JSON.stringify({ n, at: Date.now() }));
+        } catch {}
+      })
       .catch(() => setStars((cached = null)));
   }, []);
   return stars;

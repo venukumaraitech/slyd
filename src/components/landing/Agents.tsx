@@ -64,7 +64,40 @@ const Steps = ({ items }: { items: ReactNode[] }) => (
   </ol>
 );
 
+const DOCKER_RUN = "docker run -d -p 3000:3000 --name slyd --restart unless-stopped ghcr.io/venukumaraitech/slyd:latest";
+const LOCAL_MCP = "http://localhost:3000/mcp";
+
 const CLIENTS: Client[] = [
+  {
+    id: "local",
+    name: "Your own Slyd",
+    badge: "Recommended",
+    body: (c) => (
+      <div className="flex flex-col gap-5">
+        <p className="text-[14px] leading-relaxed text-ink-2">
+          Run Slyd on your computer and connect your agent to it. It&apos;s free, private, works offline, and keeps the shared server free for people trying Slyd out.
+        </p>
+        <CopyBlock id="local-docker" label="1. Start Slyd (needs Docker)" text={DOCKER_RUN} copy={c.copy} copied={c.copied} mono />
+        <p className="-mt-2 text-[12.5px] text-muted">
+          Then open <b className="text-ink-2">http://localhost:3000</b>. No Docker? <a className="underline underline-offset-2 hover:text-ink" href="https://github.com/venukumaraitech/slyd#run-your-own-slyd" target="_blank" rel="noreferrer">Run it with Node.js</a> instead.
+        </p>
+        <CopyBlock id="local-cc" label="2. Connect Claude Code" text={`claude mcp add --transport http slyd ${LOCAL_MCP}`} copy={c.copy} copied={c.copied} mono />
+        <CopyBlock
+          id="local-desktop"
+          label="…or Claude Desktop: Settings → Developer → Edit config, add this, then restart"
+          text={JSON.stringify({ mcpServers: { slyd: { command: "npx", args: ["-y", "mcp-remote", LOCAL_MCP] } } }, null, 2)}
+          copy={c.copy}
+          copied={c.copied}
+          mono
+        />
+        <CopyBlock id="local-cursor" label="…or Cursor (~/.cursor/mcp.json)" text={JSON.stringify({ mcpServers: { slyd: { url: LOCAL_MCP } } }, null, 2)} copy={c.copy} copied={c.copied} mono />
+        <CopyBlock id="local-vscode" label="…or VS Code (.vscode/mcp.json)" text={JSON.stringify({ servers: { slyd: { type: "http", url: LOCAL_MCP } } }, null, 2)} copy={c.copy} copied={c.copied} mono />
+        <p className="rounded-xl bg-panel-2 px-4 py-3 text-[12.5px] leading-relaxed text-muted">
+          claude.ai and ChatGPT on the web connect from their own cloud, so they can&apos;t reach <code className="font-mono">localhost</code>. Use Claude Desktop or Claude Code with your local Slyd, or the shared server in the other tabs.
+        </p>
+      </div>
+    ),
+  },
   {
     id: "claude",
     name: "Claude",
@@ -196,9 +229,24 @@ export function AgentsPage() {
           </p>
         </motion.div>
 
+        {/* Self-host nudge */}
+        <button
+          onClick={() => {
+            setTab("local");
+            document.getElementById("setup")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }}
+          className="group mt-8 flex w-full items-center gap-3 rounded-2xl bg-accent-soft px-5 py-3.5 text-left ring-1 ring-accent/25 transition hover:ring-accent/50"
+        >
+          <Zap size={16} className="shrink-0 text-accent" />
+          <span className="flex-1 text-[13.5px] leading-snug text-ink-2">
+            <b className="font-semibold text-ink">Using Slyd a lot? Run your own.</b> One Docker command, then connect your agent to <code className="font-mono text-[12.5px]">localhost:3000/mcp</code>. Private, offline, and it keeps the shared server free for everyone.
+          </span>
+          <ArrowRight size={15} className="shrink-0 text-accent transition-transform group-hover:translate-x-0.5" />
+        </button>
+
         {/* URL hero */}
         <div className="mt-10 flex flex-wrap items-center gap-3 rounded-2xl bg-panel p-2 pl-5 shadow-sm">
-          <span className="font-mono text-[12px] tracking-wide text-muted uppercase">Server URL</span>
+          <span className="font-mono text-[12px] tracking-wide text-muted uppercase">Shared server</span>
           <code className="min-w-0 flex-1 truncate font-mono text-[15px] text-ink">{MCP_URL}</code>
           <button onClick={() => c.copy("hero", MCP_URL)} className={buttonClass("primary", "md")}>
             {c.copied === "hero" ? <Check size={15} /> : <Copy size={15} />} {c.copied === "hero" ? "Copied" : "Copy URL"}
@@ -217,7 +265,7 @@ export function AgentsPage() {
         </div>
 
         {/* Setup tabs */}
-        <section className="mt-14 overflow-hidden rounded-3xl bg-panel shadow-sm">
+        <section id="setup" className="mt-14 scroll-mt-6 overflow-hidden rounded-3xl bg-panel shadow-sm">
           <div className="no-scrollbar flex gap-1 overflow-x-auto border-b border-line p-2">
             {CLIENTS.map((x) => (
               <button key={x.id} onClick={() => setTab(x.id)} className={cn("relative shrink-0 rounded-xl px-4 py-2.5 text-left transition-colors", tab === x.id ? "text-ink" : "text-muted hover:text-ink-2")}>

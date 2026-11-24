@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import { googleFontsHref } from "@/lib/model/constants";
+import { ServiceWorker } from "@/components/ui/ServiceWorker";
 import { Analytics } from "@vercel/analytics/next";
 import { AUTHOR, GITLAB_REPO_URL, REPO_URL, SITE_URL } from "@/lib/site";
 import { OG_ALT, OG_SIZE } from "@/lib/og";
@@ -87,7 +88,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="font-sans grain">
         {children}
         {/* Privacy-friendly page views; enable "Analytics" for the project in the Vercel dashboard */}
-        <Analytics />
+        {/* Vercel Analytics only exists on Vercel; self-hosted copies skip it. */}
+        {process.env.VERCEL === "1" && <Analytics />}
+        <ServiceWorker />
       </body>
     </html>
   );

@@ -144,7 +144,7 @@ export function Dashboard() {
           </div>
           <InstallButton />
           <StarButton />
-          <Link href="/agents" className={buttonClass("ghost", "sm")}>
+          <Link href="/agents" prefetch={false} className={buttonClass("ghost", "sm")}>
             <Bot size={15} /> AI agents
           </Link>
           <Button size="sm" variant="ghost" onClick={() => fileRef.current?.click()}>
