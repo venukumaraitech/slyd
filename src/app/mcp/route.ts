@@ -1,5 +1,6 @@
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { createSlydServer } from "@/lib/mcp/server";
+import { siteMovedTo } from "@/lib/site";
 
 /**
  * Remote MCP endpoint: https://tryslyd.vercel.app/mcp (Streamable HTTP, stateless).
@@ -28,6 +29,9 @@ const withCors = (res: Response) => {
  */
 function publicOrigin(req: Request) {
   if (process.env.PUBLIC_URL) return process.env.PUBLIC_URL.replace(/\/$/, "");
+  // The website moved (tryslyd.vercel.app → GitHub Pages): carousel links open there.
+  const moved = siteMovedTo();
+  if (moved) return moved;
   const url = new URL(req.url);
   const host = req.headers.get("x-forwarded-host")?.split(",")[0].trim() || req.headers.get("host") || url.host;
   const proto = req.headers.get("x-forwarded-proto")?.split(",")[0].trim() || url.protocol.replace(":", "");

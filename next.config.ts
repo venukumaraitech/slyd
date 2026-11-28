@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { siteMovedTo } from "./src/lib/site";
 
 /**
  * PAGES=1 builds a static copy for GitHub Pages (venukumaraitech.github.io/slyd):
@@ -9,10 +10,10 @@ const pages = process.env.PAGES === "1";
 const basePath = pages ? process.env.NEXT_PUBLIC_BASE_PATH || "" : "";
 
 /**
- * SITE_MOVED_TO=https://… turns a deployment into just the MCP server: /mcp keeps working
+ * SITE_MOVED_TO=https://… (automatic on tryslyd.vercel.app) turns a deployment into just the MCP server: /mcp keeps working
  * and every other address redirects there (used on Vercel once the site moved to GitHub Pages).
  */
-const movedTo = (process.env.SITE_MOVED_TO || "").replace(/\/$/, "");
+const movedTo = siteMovedTo();
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,

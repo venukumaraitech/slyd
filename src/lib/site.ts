@@ -62,3 +62,15 @@ export const withBase = (path: string) => (path.startsWith("/") ? BASE_PATH + pa
 
 /** The shared MCP server. Static copies (GitHub Pages) have none of their own and point at the hosted one. */
 export const HOSTED_MCP_URL = process.env.NEXT_PUBLIC_MCP_URL || `${SITE_URL}/mcp`;
+
+/**
+ * The original deployment (tryslyd.vercel.app) now only runs the MCP server; the website
+ * lives on GitHub Pages. Vercel sets VERCEL_PROJECT_PRODUCTION_URL on every build and
+ * request, so no project settings are needed. SITE_MOVED_TO overrides this anywhere.
+ */
+export const PAGES_SITE_URL = "https://venukumaraitech.github.io/slyd";
+export function siteMovedTo(env: Record<string, string | undefined> = process.env) {
+  const explicit = env.SITE_MOVED_TO?.replace(/\/$/, "");
+  if (explicit) return explicit;
+  return env.VERCEL_PROJECT_PRODUCTION_URL === "tryslyd.vercel.app" ? PAGES_SITE_URL : "";
+}
