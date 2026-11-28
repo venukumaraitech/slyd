@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
-import { AUTHOR, ISSUES_URL, REPO_URL, SITE_URL } from "@/lib/site";
+import { AUTHOR, HOSTED_MCP_URL, ISSUES_URL, REPO_URL, SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Privacy — Slyd",
@@ -27,8 +27,8 @@ const sections: { h: string; body: React.ReactNode }[] = [
     body: (
       <ul>
         <li><b>Carousel content:</b> none. Projects are stored in your browser (IndexedDB) and never uploaded to us.</li>
-        <li><b>Anonymous usage statistics:</b> we use Vercel Web Analytics to count page views. It doesn&apos;t use cookies and doesn&apos;t identify you.</li>
-        <li><b>Server logs:</b> our host, Vercel, keeps standard request logs (such as IP address, time and the page requested) for a short period for security and reliability. We don&apos;t use them to track anyone.</li>
+        <li><b>No analytics:</b> the website doesn&apos;t count or track visits, and uses no cookies.</li>
+        <li><b>Server logs:</b> the website is hosted on GitHub Pages and the shared MCP server on Vercel. Both keep standard request logs (such as IP address, time and the page requested) for a short period for security and reliability. We don&apos;t use them to track anyone. The desktop app sends nothing anywhere.</li>
       </ul>
     ),
   },
@@ -37,7 +37,7 @@ const sections: { h: string; body: React.ReactNode }[] = [
     body: (
       <>
         <p>
-          When an AI assistant such as Claude uses the Slyd connector at <code>{SITE_URL.replace(/^https?:\/\//, "")}/mcp</code>, it sends the carousel it wants to make (slide text, colours and photo search words). The server turns that into a link and replies straight away. It is stateless: nothing is saved, and requests aren&apos;t logged beyond the hosting logs above.
+          When an AI assistant such as Claude uses the Slyd connector at <code>{HOSTED_MCP_URL.replace(/^https?:\/\//, "")}</code>, it sends the carousel it wants to make (slide text, colours and photo search words). The server turns that into a link and replies straight away. It is stateless: nothing is saved, and requests aren&apos;t logged beyond the hosting logs above.
         </p>
         <p>
           The carousel is packed into the part of the link after the <code>#</code>. Browsers never send that part to a server, so when you open the link, your carousel is read only by your own browser. The server never receives your conversation, chat history, files or anything other than what the assistant passes to the tool.

@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { MonitorDown, X } from "lucide-react";
-import { DESKTOP_DOWNLOADS } from "@/lib/site";
+import { DESKTOP_DOWNLOADS, withBase } from "@/lib/site";
 import { DesktopDownload, useDesktopOS, useIsDesktopApp } from "./DesktopDownload";
 import { LogoMark } from "./Logo";
 import { cn } from "./cn";
@@ -22,7 +22,7 @@ function useOffer() {
 export function InstallButton({ className }: { className?: string }) {
   const os = useOffer();
   if (!os) return null;
-  const href = os === "windows" ? DESKTOP_DOWNLOADS.windows.file : os === "linux" ? DESKTOP_DOWNLOADS.linux.file : "/#self-host";
+  const href = os === "windows" ? DESKTOP_DOWNLOADS.windows.file : os === "linux" ? DESKTOP_DOWNLOADS.linux.file : withBase("/#self-host");
   return (
     <a href={href} className={cn("inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-[13px] font-medium text-ink-2 transition hover:bg-line hover:text-ink", className)} title="Get the Slyd desktop app">
       <MonitorDown size={15} /> Desktop app

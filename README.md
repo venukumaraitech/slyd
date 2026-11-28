@@ -1,6 +1,6 @@
 <div align="center">
 
-<a href="https://tryslyd.vercel.app"><img src="https://tryslyd.vercel.app/og.jpg" alt="Slyd: carousels that stop the scroll" width="100%" /></a>
+<a href="https://venukumaraitech.github.io/slyd/"><img src="https://venukumaraitech.github.io/slyd/og.jpg" alt="Slyd: carousels that stop the scroll" width="100%" /></a>
 
 # Slyd
 
@@ -9,15 +9,15 @@
 A free, open source carousel maker for Instagram, LinkedIn and X.<br />
 Design in your browser, or let your AI agent build the carousel for you.
 
-[**Download the desktop app**](#desktop-app) · [**Try it online**](https://tryslyd.vercel.app) · [**Connect your AI agent**](#create-carousels-with-your-ai-agent)
+[**Download the desktop app**](#desktop-app) · [**Website**](https://venukumaraitech.github.io/slyd/) · [**Connect your AI agent**](#create-carousels-with-your-ai-agent)
 
-[![Live](https://img.shields.io/badge/live-tryslyd.vercel.app-FF5A1F?style=flat-square)](https://tryslyd.vercel.app)
+[![Website](https://img.shields.io/badge/website-venukumaraitech.github.io%2Fslyd-FF5A1F?style=flat-square)](https://venukumaraitech.github.io/slyd/)
 [![Desktop](https://img.shields.io/badge/desktop-Windows%20%C2%B7%20Mac%20%C2%B7%20Linux-141311?style=flat-square)](#desktop-app)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fvenukumaraitech%2Fslyd-141311?style=flat-square&logo=docker)](#run-your-own-slyd-server)
 [![MCP](https://img.shields.io/badge/MCP-ready-141311?style=flat-square)](#create-carousels-with-your-ai-agent)
 [![License: MIT](https://img.shields.io/badge/license-MIT-141311?style=flat-square)](./LICENSE)
 [![Next.js](https://img.shields.io/badge/Next.js-15-141311?style=flat-square&logo=nextdotjs)](https://nextjs.org)
-[![No sign-up](https://img.shields.io/badge/sign--up-not%20required-141311?style=flat-square)](https://tryslyd.vercel.app/app)
+[![No sign-up](https://img.shields.io/badge/sign--up-not%20required-141311?style=flat-square)](#desktop-app)
 
 </div>
 
@@ -130,7 +130,7 @@ Running the [Docker image](#run-your-own-slyd-server) instead? Use `http://local
 
 > **claude.ai and ChatGPT on the web** connect from their own cloud, so they can't reach `localhost`. Use Claude Desktop or Claude Code with your local server, put your Slyd on a public URL, or use the shared server below.
 
-**Shared server** (handy for a quick try; please self-host for regular use): `https://tryslyd.vercel.app/mcp`. Add it in Claude or ChatGPT under Settings → Connectors → *Add custom connector*, with no authentication. One-click installs for Cursor and VS Code are on [tryslyd.vercel.app/agents](https://tryslyd.vercel.app/agents).
+**Shared server** (handy for a quick try; please self-host for regular use): `https://tryslyd.vercel.app/mcp`. Add it in Claude or ChatGPT under Settings → Connectors → *Add custom connector*, with no authentication. One-click installs for Cursor and VS Code are on [the agents page](https://venukumaraitech.github.io/slyd/agents/).
 
 Then ask for what you want:
 
@@ -150,7 +150,7 @@ Agents can use the whole editor: every template, layout, palette, font, texture 
 
 **Privacy:** the whole carousel travels inside the link's `#fragment`, which browsers never send to a server. Nothing is stored.
 
-**No MCP?** Any assistant that can read a web page can build a link from [`/llms.txt`](https://tryslyd.vercel.app/llms.txt), using the [JSON Schema](https://tryslyd.vercel.app/carousel.schema.json).
+**No MCP?** Any assistant that can read a web page can build a link from [`/llms.txt`](https://venukumaraitech.github.io/slyd/llms.txt), using the [JSON Schema](https://venukumaraitech.github.io/slyd/carousel.schema.json).
 
 <details>
 <summary><b>Example spec</b></summary>

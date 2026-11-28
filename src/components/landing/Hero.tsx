@@ -14,7 +14,7 @@ import { HeroShader } from "./HeroShader";
 import { SplitWords } from "./primitives";
 import { demo } from "./demo";
 
-import { REPO_URL } from "@/lib/site";
+import { REPO_URL, withBase } from "@/lib/site";
 
 export function Nav() {
   const { scrollY } = useScroll();
@@ -39,7 +39,7 @@ export function Nav() {
         <Logo />
         <div className="hidden items-center gap-1 md:flex">
           {links.map(([l, h]) => (
-            <a key={h} href={h} className="rounded-lg px-3 py-1.5 text-[14px] text-ink-2 transition-colors hover:bg-line hover:text-ink">
+            <a key={h} href={withBase(h)} className="rounded-lg px-3 py-1.5 text-[14px] text-ink-2 transition-colors hover:bg-line hover:text-ink">
               {l}
             </a>
           ))}

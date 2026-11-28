@@ -115,12 +115,15 @@ export function OpenSpec() {
     ran.current = true;
     const hash = window.location.hash;
     const path = window.location.pathname;
+    const search = window.location.search;
     // Clear the fragment right away: the carousel's text shouldn't linger in history.
     history.replaceState(null, "", path);
     const run = () => openHere(hash);
     // People with the desktop app can send links from the website straight into it.
     if (hash.length >= 4 && wantsAppChoice()) {
-      const link = `slyd://open${path.startsWith("/c/") ? path : "/c/carousel"}${hash}`;
+      // The carousel's name: from /c/<name>, or ?n=<name> when a static host forwarded the link here.
+      const name = path.match(/\/c\/([^/]+)/)?.[1] ?? encodeURIComponent(new URLSearchParams(search).get("n") || "carousel");
+      const link = `slyd://open/c/${name}${hash}`;
       setHandoff({ link, run });
       if (readLocal(APP_PREF) === "always") {
         window.location.href = link;

@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore, type ReactNode } from "react";
 import { Download } from "lucide-react";
-import { DESKTOP_DOWNLOADS, RELEASES_URL } from "@/lib/site";
+import { DESKTOP_DOWNLOADS, RELEASES_URL, withBase } from "@/lib/site";
 import { MagneticLink } from "./Button";
 import { cn } from "./cn";
 
@@ -113,7 +113,7 @@ export function TrackDownload({ children, className }: { children: ReactNode; cl
 /** Label and target for a "Download" button; phones and tablets go to the download section. */
 export function useDownloadCTA() {
   const dl = useDesktopDownload();
-  return dl ? { href: dl.href, label: `Download for ${dl.os}`, short: "Download" } : { href: "/#self-host", label: "Download Slyd", short: "Download" };
+  return dl ? { href: dl.href, label: `Download for ${dl.os}`, short: "Download" } : { href: withBase("/#self-host"), label: "Download Slyd", short: "Download" };
 }
 
 /** The big "Download for <your OS>" button used across the landing page. */

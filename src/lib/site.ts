@@ -51,3 +51,14 @@ export const DESKTOP_DOWNLOADS = {
   linux: { label: "Linux (AppImage)", file: download("Slyd-linux-x86_64.AppImage") },
   linuxArm: { label: "Linux ARM (AppImage)", file: download("Slyd-linux-arm64.AppImage") },
 } as const;
+
+/**
+ * Path prefix when Slyd is served from a sub-folder, e.g. "/slyd" on GitHub Pages
+ * (venukumaraitech.github.io/slyd). Next's <Link> and router add it automatically;
+ * plain <a href>, the manifest and the service worker use withBase().
+ */
+export const BASE_PATH = (process.env.NEXT_PUBLIC_BASE_PATH || "").replace(/\/$/, "");
+export const withBase = (path: string) => (path.startsWith("/") ? BASE_PATH + path : path);
+
+/** The shared MCP server. Static copies (GitHub Pages) have none of their own and point at the hosted one. */
+export const HOSTED_MCP_URL = process.env.NEXT_PUBLIC_MCP_URL || `${SITE_URL}/mcp`;

@@ -30,13 +30,13 @@ export const metadata: Metadata = {
     siteName: "Slyd",
     url: SITE_URL,
     locale: "en_US",
-    images: [{ url: "/og.jpg", secureUrl: `${SITE_URL}/og.jpg`, ...OG_SIZE, type: "image/jpeg", alt: OG_ALT }],
+    images: [{ url: `${SITE_URL}/og.jpg`, secureUrl: `${SITE_URL}/og.jpg`, ...OG_SIZE, type: "image/jpeg", alt: OG_ALT }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Slyd — Carousels that stop the scroll",
     description: "Free, open source, laptop-first carousel maker.",
-    images: [{ url: "/og.jpg", alt: OG_ALT }],
+    images: [{ url: `${SITE_URL}/og.jpg`, alt: OG_ALT }],
   },
 };
 

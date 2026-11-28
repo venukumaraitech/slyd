@@ -9,9 +9,9 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { buttonClass } from "@/components/ui/Button";
 import { cn } from "@/components/ui/cn";
 import { DesktopDownload, TrackDownload, useDownloadCTA, useIsDesktopApp } from "@/components/ui/DesktopDownload";
-import { DESKTOP_MCP_URL, SITE_URL } from "@/lib/site";
+import { DESKTOP_MCP_URL, HOSTED_MCP_URL, SITE_URL, withBase } from "@/lib/site";
 
-const MCP_URL = `${SITE_URL}/mcp`;
+const MCP_URL = HOSTED_MCP_URL;
 
 function useCopy() {
   const [copied, setCopied] = useState<string | null>(null);
@@ -370,10 +370,10 @@ export function AgentsPage() {
             <CopyBlock id="nomcp" text={NO_MCP} copy={c.copy} copied={c.copied} mono={false} />
           </div>
           <div className="mt-4 flex flex-wrap gap-4 text-[13px]">
-            <a href="/llms.txt" target="_blank" className="flex items-center gap-1 text-ink-2 hover:text-accent">
+            <a href={withBase("/llms.txt")} target="_blank" className="flex items-center gap-1 text-ink-2 hover:text-accent">
               llms.txt <ExternalLink size={12} />
             </a>
-            <a href="/carousel.schema.json" target="_blank" className="flex items-center gap-1 text-ink-2 hover:text-accent">
+            <a href={withBase("/carousel.schema.json")} target="_blank" className="flex items-center gap-1 text-ink-2 hover:text-accent">
               JSON Schema <ExternalLink size={12} />
             </a>
           </div>
